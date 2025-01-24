@@ -52,13 +52,28 @@ export async function getCategories(restname) {
     try {
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        const result = await db.collection(restname + " Data").findOne({ categories: { $exists: true } }, { projection: { categories: 1, _id: 0 } });
+        const result = await db.collection(`${restname} Data`).findOne({ categories: { $exists: true } }, { projection: { categories: 1, _id: 0 } });
+        console.log('Fetched categories:', result); // Add logging
         return result;
     } catch (error) {
         console.error('Error getting categories:', error);
         throw error;
     }
 }
+
+export async function getItems(restname) {
+    try {
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+        const items = await db.collection(restname).find({}).sort({ order: 1 }).toArray();
+        console.log('Fetched items:', items); // Add logging
+        return items;
+    } catch (error) {
+        console.error('Error getting items:', error);
+        throw error;
+    }
+}
+
 
 export async function newCategory(restname, category) {
     try {
@@ -74,17 +89,6 @@ export async function newCategory(restname, category) {
     }
 }
 
-export async function getItems(restname) {
-    try {
-        const client = await getMongoClient();
-        const db = client.db("restaurant");
-        const items = await db.collection(restname).find({}).sort({ order: 1 }).toArray();
-        return items;
-    } catch (error) {
-        console.error('Error getting items:', error);
-        throw error;
-    }
-}
 
 export async function deleteOneItem(restname, id) {
     try {

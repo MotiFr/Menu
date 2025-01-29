@@ -143,20 +143,22 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Category
                         </label>
-                        <input
-                            list="categories"
+                        <select
                             id="category"
                             name="category"
                             required
                             value={formData.category}
                             onChange={handleInputChange}
                             className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
-                        />
-                        <datalist id="categories">
+                        >
+                            <option value="">--Select a category--</option>
                             {CATEGORIES.map((category) => (
-                                <option key={category} value={category} />
+                                <option key={category.name} value={category.name}>
+                                    {category.name}
+                                </option>
                             ))}
-                        </datalist>
+                        </select>
+
                     </div>
 
                     <div>
@@ -215,9 +217,9 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                         </button>
                         <button
                             type="submit"
-                            className={`px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg ${loading ? 'bg-amber-200' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
+                            className={`w-24 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg ${loading ? 'bg-amber-200' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
                         >
-                            Save Changes
+                            {loading ? 'Saving...' : 'Save'}
                         </button>
                     </div>
                 </form>

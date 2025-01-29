@@ -1,12 +1,11 @@
 "use client"
 import DeleteDialog from "@/components/App/DeleteDialog";
 import EditMenuDialog from "@/components/App/EditMenuDialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
-
+import { CategoryDropDown, handleDown, handleUp, SkeletonEditMenu } from "./functions";
+import { showError } from "./errToast";
 
 
 export default function editMenuPage() {
@@ -14,7 +13,6 @@ export default function editMenuPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDelete, setisDelete] = useState(false);
-
 
 
   const handleItemClick = (item) => {
@@ -27,10 +25,34 @@ export default function editMenuPage() {
     setisDelete(true)
   }
 
+  const handleView = async (item) => {
+    try {
+      const response = await fetch('/api/View', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          item: item
+        }),
+      });
+
+      await response.json();
+
+
+      if (response.ok) {
+        setRefresh(prev => !prev);
+      }
+
+    } catch (error) {
+      showError("Something went wrong")
+    } finally {
+    }
+  }
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingPosition, setLoadingPosition] = useState(false);
-  
 
   const [items, setItems] = useState([]);
   const [CATEGORIES, setCATEGORIES] = useState([])
@@ -55,13 +77,17 @@ export default function editMenuPage() {
   }, [refresh]);
 
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isItemVisible, setIsItemVisible] = useState(false);
+  const [isCatVisible, setIsCatVisible] = useState(false);
   const [enteredName, setEnteredName] = useState("");
   const [enteredPrice, setEnteredPrice] = useState("");
   const [enteredCategory, setEnteredCategory] = useState("");
   const [enteredDescription, setEnteredDescription] = useState("");
   const [enteredURL, setEnteredURL] = useState("");
   const [enteredAllergens, setEnteredAllergens] = useState("")
+  const [enteredCatName, setEnteredCatName] = useState("")
+  const [enteredCatDescription, setEnteredCatDescription] = useState("")
+
 
   const [submission, setSubmission] = useState("");
   const [submissionCat, setSubmissionCat] = useState("");
@@ -70,110 +96,60 @@ export default function editMenuPage() {
 
   if (loading) {
     return (
-      <>
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Menu</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
-              Add, edit, or remove items from your menu.
-            </p>
-            <div className="pt-10"></div>
-            <div className="max-w-4xl mx-auto">
-              <button
-                onClick={() => setIsVisible(!isVisible)}
-                className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
-              >
-                Add an item
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="p-10 flex items-start space-x-4">
-          <Skeleton className="w-20 h-20 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="h-5 w-16 mt-2" />
-          </div>
-        </div>
-        <div className="p-10 flex items-start space-x-4">
-          <Skeleton className="w-20 h-20 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="h-5 w-16 mt-2" />
-          </div>
-        </div>
-      </>
+      <SkeletonEditMenu />
     )
   }
 
-
-
   if (error) return <div>Error: {error.message}</div>;
 
-  async function handleUp(item, items) {
-    setLoadingPosition(true)
-    try {
-      const response = await fetch('/api/handleUp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          item: item,
-          items: items,
-        }),
-      });
-
-      await response.json();
-
-
-      if (response.ok) {
-        setRefresh(prev => !prev);
-      }
-
-    } catch (error) {
+  async function submitCategory(event) {
+    event.preventDefault();
+    setIsSubmitting(true)
+    setSubmissionCat("")
+    if (enteredCatName === "") {
+      setSubmissionCat(<span className="text-red-600">Please enter a name</span>);
+      return;
     }
-    finally {
-      setLoadingPosition(false)
-    }
-  }
+    if (!CATEGORIES || !CATEGORIES.some(category => category.name === enteredCatName)) {
+      try {
+        const response = await fetch('/api/categoryUp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            category: { name: enteredCatName, description: enteredCatDescription }
+          }),
+        });
 
-  async function handleDown(item, items) {
-    setLoadingPosition(true)
-    try {
-      const response = await fetch('/api/handleDown', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          item: item,
-          items: items,
-        }),
-      });
-
-      await response.json();
+        await response.json();
 
 
-      if (response.ok) {
-        setRefresh(prev => !prev);
+        if (response.ok) {
+          setSubmissionCat(<span className="text-green-600">Successfully added a category.</span>);
+          setIsSubmitting(false)
+          setEnteredCatDescription("")
+          setEnteredCatName("")
+          setRefresh(prev => !prev);
+        }
+        else {
+          setSubmissionCat(<span className="text-red-600">Failed, please try again later.</span>);
+        }
+
+      } catch (error) {
+        setSubmissionCat(<span className="text-red-600">Failed, please try again later.</span>);
+      } finally {
+        setIsSubmitting(false)
       }
-
-    } catch (error) {
-    } finally {
-      setLoadingPosition(false)
+    } else {
+      setSubmissionCat(<span className="text-red-600">Category already exists.</span>);
+      setIsSubmitting(false)
     }
   }
 
   async function submitForm(event) {
     event.preventDefault();
     setSubmission("")
-    setSubmissionCat("")
-    setIsSubmitting(true)
 
     let selectedAllergens = "";
 
@@ -195,32 +171,8 @@ export default function editMenuPage() {
     }
 
     else {
-      if (!CATEGORIES.some(category => category === enteredCategory)) {
-        try {
-          const response = await fetch('/api/categoryUp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              category: enteredCategory,
-            }),
-          });
+      setIsSubmitting(true)
 
-          await response.json();
-
-
-          if (response.ok) {
-            setSubmissionCat(<span className="text-green-600">Successfully added a category.</span>);
-          }
-          else {
-            setSubmissionCat(<span className="text-red-600">Failed, please try again later.</span>);
-          }
-
-        } catch (error) {
-          setSubmissionCat(<span className="text-red-600">Failed, please try again later.</span>);
-        }
-      }
 
       try {
         const response = await fetch('/api/form', {
@@ -268,23 +220,20 @@ export default function editMenuPage() {
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Menu</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">
-          Add, edit, or remove items from your menu.
+          Here you can see all your items and categories, edit and remove them.
         </p>
         <div className="pt-10"></div>
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => setIsVisible(!isVisible)}
+            onClick={() => setIsItemVisible(!isItemVisible)}
             className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
           >
-            Add an item
+            Add Item
           </button>
 
-          {isVisible && (
+          {isItemVisible && (
             <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Menu</h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
-                Add, edit, or remove items from your menu.
-              </p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add an item to your menu</h1>
 
               <form className="mt-8 space-y-6" onSubmit={submitForm}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -317,22 +266,28 @@ export default function editMenuPage() {
                   <div className="relative">
                     <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Category
+
                     </label>
-                    <input
+                    <select
                       id="category"
+                      name="category"
                       value={enteredCategory}
                       onChange={(event) => setEnteredCategory(event.target.value)}
                       className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
-                      list="categories"
-                    />
-                    <datalist id="categories">
+                    >
+                      <option value="">--Select a category--</option>
                       {CATEGORIES.map((category) => (
-                        <option key={category}>
-                          {category}
+                        <option key={category.name} value={category.name}>
+                          {category.name}
                         </option>
                       ))}
-                    </datalist>
+                    </select>
                   </div>
+                  {CATEGORIES.length === 0 && (<div>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                      No categories added yet. Start by adding your first category below.
+                    </p>
+                  </div>)}
 
                   <div className="relative">
                     <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -379,16 +334,68 @@ export default function editMenuPage() {
                     <span className="font-medium">
                       {submission}
                     </span>
-                    <span className="font-medium">
-                      {submissionCat}
-                    </span>
                   </div>
 
                   <button
                     type="submit"
-                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${ isSubmitting ? `bg-amber-200` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
+                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
                   >
-                    Add Item
+                    {isSubmitting ? 'Adding...' : 'Add Item'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          <button
+            onClick={() => setIsCatVisible(!isCatVisible)}
+            className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
+          >
+            Add Category
+          </button>
+          {isCatVisible && (
+            <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add category to your menu</h1>
+
+              <form className="mt-8 space-y-6" onSubmit={submitCategory}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="relative">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Category name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={enteredCatName}
+                      onChange={(event) => setEnteredCatName(event.target.value)}
+                      className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
+                    />
+                    <div className="relative mt-4">
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Category description
+                      </label>
+                      <textarea
+                        type="text"
+                        rows={2}
+                        id="name"
+                        value={enteredCatDescription}
+                        onChange={(event) => setEnteredCatDescription(event.target.value)}
+                        className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end items-center space-x-4">
+                  <div className="flex flex-col items-start space-y-2">
+                    <span className="font-medium">
+                      {submissionCat}
+                    </span>
+                  </div>
+                  <button
+                    type="submit"
+                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
+                  >
+                    {isSubmitting ? 'Adding...' : 'Add Category'}
                   </button>
                 </div>
               </form>
@@ -396,87 +403,120 @@ export default function editMenuPage() {
           )}
 
           <div className="mt-8 space-y-8">
-            {CATEGORIES.map((category) => {
-              const Citems = items.filter((item) => item.category === category);
-              return (
-                <div key={category}>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {category}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Citems.map((item, index) => (
-                      <div
-                        key={item._id}
-                        onClick={() => handleItemClick(item)}
-                        className="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow duration-200"
-                      >
-                         {index > 0 && !loadingPosition && (
-                        <button
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleUp(item, Citems);
-                          }}
-                          className="absolute top-0 right-0 p-2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+            {CATEGORIES && CATEGORIES.length > 0 ? (
+              CATEGORIES.map((category, indexer) => {
+                const Citems = items.filter((item) => item.category === category.name);
+                return (
+                  <div key={category.name}>
+                    <CategoryDropDown
+                      setRefresh={setRefresh}
+                      category={category}
+                      indexer={indexer}
+                      CATEGORIES={CATEGORIES}
+                    />
+                    <div className="text-l text-gray-900 dark:text-white mb-4">{category.description}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Citems.map((item, index) => (
+                        <div
+                          key={item._id}
+                          onClick={() => handleItemClick(item)}
+                          className="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow duration-200"
                         >
-                          <ArrowUp className="h-6 w-6" />
-                        </button> )}
-                        {index < Citems.length - 1 && !loadingPosition && (
-                        <button
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleDown(item, Citems);
-                          }}
-                          className="absolute top-7 right-0 p-2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                        >
-                          <ArrowDown className="h-6 w-6" />
-                        </button>
-                        )}
-                        <button
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleDelete(item);
-                          }}
-                          className="absolute bottom-0 right-0 p-2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                        >
-                          <Trash2 className="h-6 w-6" />
-                        </button>
-                        
-                        <div className="flex items-start space-x-4 pr-8">
-                          {item.url && (
-                            <Image
-                              src={item.url}
-                              alt={item.name}
-                              width={150}
-                              height={150}
-                              className="w-20 h-20 object-cover rounded-lg"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                              {item.name}
-                            </h3>
-                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                              {item.description}
-                            </p>
-                            <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
-                              ${item.price}
-                            </p>
-
-                            {items.length === 0 && (
-                              <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                                No items added yet. Start by adding your first menu item above.
-                              </p>
+                          <div className="absolute left-0 top-0 flex flex-col p-2">
+                            {index > 0 && !loadingPosition && (
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleUp(item, Citems, setLoadingPosition, setRefresh);
+                                }}
+                                className="mb-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                              >
+                                <ArrowUp className="h-6 w-6" />
+                              </button>
+                            )}
+                            {index < Citems.length - 1 && !loadingPosition && (
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDown(item, Citems, setLoadingPosition, setRefresh);
+                                }}
+                                className="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                              >
+                                <ArrowDown className="h-6 w-6" />
+                              </button>
                             )}
                           </div>
+
+                          <div className="absolute right-0 bottom-0 flex flex-col p-2">
+                            <button
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleView(item);
+                              }}
+                              className="mb-1 text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400"
+                            >
+                              {item.seen ? (
+                                <div><Eye className="h-6 w-6" /></div>
+                              ) : (
+                                <div><EyeOff className="h-6 w-6" /></div>
+                              )}
+                            </button>
+                            <button
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleDelete(item);
+                              }}
+                              className="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                            >
+                              <Trash2 className="h-6 w-6" />
+                            </button>
+                          </div>
+
+                          <div className="flex items-start space-x-4 pl-12 pr-12">
+                            {item.url && (
+                              <Image
+                                src={item.url}
+                                alt={item.name}
+                                width={150}
+                                height={150}
+                                className="w-20 h-20 object-cover rounded-lg"
+                              />
+                            )}
+                            <div className="flex-1">
+                              <h3 className={item.seen ? `text-lg font-medium text-black dark:text-white` : `text-lg font-medium text-gray-500 dark:text-gray-400`}>
+                                {item.name}
+                              </h3>
+                              <p className={item.seen ? `mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2` : `mt-1 text-sm text-gray-400 dark:text-gray-400 line-clamp-1`}>
+                                {item.description}
+                              </p>
+                              <div className="absolute bottom-2 right-12">
+                              <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
+                                {item.price}
+                              </p>
+                              </div>
+
+                              {items.length === 0 && (
+                                <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                                  No items added yet. Start by adding your first menu item above.
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                No items added yet. Start by adding your first menu item above.
+              </p>
+            )}
           </div>
+
         </div>
+
         <DeleteDialog
           setRefresh={setRefresh}
           item={selectedItem}

@@ -86,18 +86,21 @@ export default function MenuPage() {
         </p>
 
         <div className="mt-8 space-y-8">
-          {CATEGORIES.map((category) => {
-            const items = menu.filter((item) => item.category === category);            
+        {CATEGORIES && CATEGORIES.length > 0 && (
+          CATEGORIES.map((category) => {
+            const items = menu.filter((item) => item.category === category.name);            
             if (items.length === 0) return null;
 
             return (
               <div key={category}>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  {category}
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {category.name}
                 </h2>
+                <div className="text-l text-gray-900 dark:text-white mb-4">{category.description}</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {items.map((item) => (
-                    <div
+                    item.seen ? (
+                      <div
                       key={item._id}
                       onClick={() => handleItemClick(item)}
                       className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow duration-200"
@@ -125,11 +128,12 @@ export default function MenuPage() {
                         </div>
                       </div>
                     </div>
+                    ) : null
                   ))}
                 </div>
               </div>
             );
-          })}
+        }))}
         </div>
       </div>
 

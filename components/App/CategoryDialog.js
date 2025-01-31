@@ -95,7 +95,7 @@ export default function CategoryDialog({ setRefresh, category, isOpen, onClose }
                         </button>
                         <button
                             type="submit"
-                            className={`w-24 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg ${loading ? 'bg-amber-200' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
+                            className={`w-24 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg ${loading ? 'bg-amber-200 cursor-not-allowed' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
                         >
                             {loading ? 'Saving...' : 'Save'}
                         </button>

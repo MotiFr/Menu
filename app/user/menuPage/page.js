@@ -2,7 +2,7 @@
 import MenuItemDialog from "@/components/App/MenuItemDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 
 
@@ -16,11 +16,18 @@ export default function MenuPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const redirect = useCallback(() => {
+      window.location.href = '/';
+    }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/items');
         const json = await response.json();
+        if (json.message === "Not authenticated") {
+          redirect();
+        }
         setCATEGORIES(json.categories);
         setMenu(json.items);
       } catch (err) {

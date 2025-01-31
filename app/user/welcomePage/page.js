@@ -1,11 +1,34 @@
 "use client"
 import { QrCode } from "lucide-react";
 import { useQRCode } from "next-qrcode";
+import { useCallback, useEffect } from "react";
 
 export default function Welcome() {
   const restaurantName = "La Bella Cucina"; // This would come from your user data
   const { Canvas } = useQRCode();
 
+  const redirect = useCallback(() => {
+        window.location.href = '/';
+      }, []);
+
+  useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await fetch('/api/items');
+          const json = await response.json();
+          if (json.message === "Not authenticated") {
+            redirect();
+          }
+          
+        } catch (err) {
+          //setError(err);
+        } finally {
+          //setLoading(false);
+        }
+      };
+  
+      fetchData();
+    }, []);
 
   return (
     <div className="max-w-4xl mx-auto">

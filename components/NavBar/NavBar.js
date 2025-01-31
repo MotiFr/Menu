@@ -1,5 +1,7 @@
 import { QrCode } from "lucide-react";
 import NavDarkButton from "./NavDarkMode";
+import SignUp from "../Main/SignUp";
+import SignIn from "../Main/SignIn";
 
 export default function NavBar() {
 
@@ -15,12 +17,8 @@ export default function NavBar() {
           </div>
           <div className="flex items-center space-x-4">
             <NavDarkButton />
-            <button className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-              Login
-            </button>
-            <button className="bg-primary dark:bg-primary-dark text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-hover dark:hover:bg-primary-hover-dark">
-              Sign Up
-            </button>
+            <SignIn />
+            <SignUp />
           </div>
         </div>
       </div>

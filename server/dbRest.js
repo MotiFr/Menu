@@ -1,9 +1,8 @@
-// dbRest.js
+"use server";
 import { MongoClient, ObjectId } from "mongodb";
 
 const uri = process.env.NEXT_ATLAS_URI;
 
-// Make client a module-level variable that's properly exported
 let client = null;
 let isConnected = false;
 

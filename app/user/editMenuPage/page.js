@@ -3,16 +3,18 @@ import DeleteDialog from "@/components/App/DeleteDialog";
 import EditMenuDialog from "@/components/App/EditMenuDialog";
 import { ArrowDown, ArrowUp, Eye, EyeOff, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CategoryDropDown, handleDown, handleUp, SkeletonEditMenu } from "./functions";
 import { showError } from "./errToast";
 
 
 export default function editMenuPage() {
 
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDelete, setisDelete] = useState(false);
+  const [isLoadingEye, setIsLoadingEye] = useState(false);
 
 
   const handleItemClick = (item) => {
@@ -26,6 +28,7 @@ export default function editMenuPage() {
   }
 
   const handleView = async (item) => {
+    setIsLoadingEye(true);
     try {
       const response = await fetch('/api/View', {
         method: 'POST',
@@ -47,6 +50,7 @@ export default function editMenuPage() {
     } catch (error) {
       showError("Something went wrong")
     } finally {
+      setIsLoadingEye(false);
     }
   }
 
@@ -59,11 +63,18 @@ export default function editMenuPage() {
   const [refresh, setRefresh] = useState(false);
 
 
+  const redirect = useCallback(() => {
+    window.location.href = '/';
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/items');
         const json = await response.json();
+        if (json.message === "Not authenticated") {
+          redirect();
+        }
         setCATEGORIES(json.categories);
         setItems(json.items);
       } catch (err) {
@@ -338,7 +349,7 @@ export default function editMenuPage() {
 
                   <button
                     type="submit"
-                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
+                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200 cursor-not-allowed` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
                   >
                     {isSubmitting ? 'Adding...' : 'Add Item'}
                   </button>
@@ -393,7 +404,7 @@ export default function editMenuPage() {
                   </div>
                   <button
                     type="submit"
-                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
+                    className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200 cursor-not-allowed` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
                   >
                     {isSubmitting ? 'Adding...' : 'Add Category'}
                   </button>
@@ -456,9 +467,9 @@ export default function editMenuPage() {
                               className="mb-1 text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400"
                             >
                               {item.seen ? (
-                                <div><Eye className="h-6 w-6" /></div>
+                                <div><Eye className={`h-6 w-6 ${isLoadingEye ? `cursor-not-allowed` : ``}`} /></div>
                               ) : (
-                                <div><EyeOff className="h-6 w-6" /></div>
+                                <div><EyeOff className={`h-6 w-6 ${isLoadingEye ? `cursor-not-allowed` : ``}`} /></div>
                               )}
                             </button>
                             <button

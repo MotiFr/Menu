@@ -58,6 +58,9 @@ export default function SignIn() {
       if (response.status === 400) {
         setError(responseData.message);
       }
+      else if (response.status === 500) {
+        setError(responseData.message);
+      }
       else {
         router.push('/user/welcomePage');
       }

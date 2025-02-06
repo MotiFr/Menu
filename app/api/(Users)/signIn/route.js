@@ -17,6 +17,6 @@ export async function POST(req) {
         
         return new NextResponse(JSON.stringify({ message: "successfully logged in" }), { status: 201 });
     } catch (error) {
-        return new NextResponse(JSON.stringify({ message: "failed to store item", error: error.message }), { status: 500 });
+        return new NextResponse(JSON.stringify({ message: "something went wrong", error: error.message }), { status: 500 });
     }
 }

@@ -1,34 +1,38 @@
 "use client"
 import { QrCode } from "lucide-react";
 import { useQRCode } from "next-qrcode";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Welcome() {
-  const restaurantName = "La Bella Cucina"; // This would come from your user data
   const { Canvas } = useQRCode();
 
+  const [fullUrl, setFullUrl] = useState('something');
+  const [restName, setRestName] = useState("");
+
   const redirect = useCallback(() => {
-        window.location.href = '/';
-      }, []);
+    window.location.href = '/';
+  }, []);
 
   useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await fetch('/api/items');
-          const json = await response.json();
-          if (json.message === "Not authenticated") {
-            redirect();
-          }
-          
-        } catch (err) {
-          //setError(err);
-        } finally {
-          //setLoading(false);
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/welcomePage');
+        const json = await response.json();
+        if (json.message === "Not authenticated") {
+          redirect();
         }
-      };
-  
-      fetchData();
-    }, []);
+        setRestName(json.restname)
+        const currentUrl = window.location.href;
+        setFullUrl(currentUrl.replace(/\/user\/welcomePage$/, `/menu/${json.restname}`));
+
+      } catch (err) {
+      } finally {
+        //setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -36,7 +40,7 @@ export default function Welcome() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome back, {restaurantName}!
+              Welcome back, {restName}! 
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-300">
               Here's your restaurant's dashboard. Your digital menu is live and ready to be shared.
@@ -59,12 +63,12 @@ export default function Welcome() {
               <div className="w-full h-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded flex items-center justify-center">
                 <span className="text-gray-500 dark:text-gray-400">
                   <Canvas
-                    text={'https://www.google.com'}
+                    text={fullUrl}
                     options={{
                       errorCorrectionLevel: 'Q',
                       width: 200,
                     }}
-                  
+
                   />
                 </span>
               </div>

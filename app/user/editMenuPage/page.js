@@ -119,6 +119,17 @@ export default function editMenuPage() {
     setSubmissionCat("")
     if (enteredCatName === "") {
       setSubmissionCat(<span className="text-red-600">Please enter a name</span>);
+      setIsSubmitting(false)
+      return;
+    }
+    if (enteredCatName.length > 50) {
+      setSubmissionCat(<span className="text-red-600">Category name is too long.</span>);
+      setIsSubmitting(false)
+      return;
+    }
+    if (enteredCatDescription.length > 500) {
+      setSubmissionCat(<span className="text-red-600">Category description is too long.</span>);
+      setIsSubmitting(false)
       return;
     }
     if (!CATEGORIES || !CATEGORIES.some(category => category.name === enteredCatName)) {
@@ -180,6 +191,19 @@ export default function editMenuPage() {
     else if (enteredCategory === "") {
       setSubmission(<span className="text-red-600">Please enter a category</span>);
     }
+    else if (enteredName.length > 100) {
+      setSubmission(<span className="text-red-600">Item name is too long.</span>);
+    }
+    else if (enteredDescription.length > 500) {
+      setSubmission(<span className="text-red-600">Item description is too long.</span>);
+    }
+    else if (enteredPrice.length > 50) {
+      setSubmission(<span className="text-red-600">Price is too long.</span>);
+    }
+    else if (setEnteredAllergens.length > 500) {
+      setSubmission(<span className="text-red-600">Allergens are too long.</span>);
+    }
+
 
     else {
       setIsSubmitting(true)

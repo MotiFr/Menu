@@ -69,6 +69,9 @@ export default function SignUp() {
         if (formData.username.length > 20 && formData.username.length !== 0) {
             setErrUsername('Username must be shorter than 20 characters');
         }
+        if (formData.username && formData.username.includes(' ')) {
+            setErrUsername('Username cant have spaces');
+        }
         if (formData.password.length < 8 && formData.password.length !== 0) {
             setErrPass('Password must be at least 8 characters');
         }

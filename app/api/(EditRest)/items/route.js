@@ -3,7 +3,6 @@ import { getCategories, getItems } from "@/server/dbRest";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const restname = "Moti's restaurant";
     const result = await verifyAuthSession();
 
     if (!result.user) {
@@ -11,8 +10,8 @@ export async function GET() {
     }
     
     try {
-        const items = await getItems(restname);
-        const categoriesOb = await getCategories(restname);
+        const items = await getItems();
+        const categoriesOb = await getCategories();
         const categories = categoriesOb.categories;
         return NextResponse.json({ items, categories });
     } catch (error) {

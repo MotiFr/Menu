@@ -1,10 +1,14 @@
 "use server";
 import { MongoClient, ObjectId } from "mongodb";
+import { cookies } from "next/headers";
+
 
 const uri = process.env.NEXT_ATLAS_URI;
 
 let client = null;
 let isConnected = false;
+let restname = null;
+let restCookie = null;
 
 export async function getMongoClient() {
     if (!client) {
@@ -19,8 +23,41 @@ export async function getMongoClient() {
     return client;
 }
 
-export async function storeNewItem(restname, name, price, category, description, url, allergens) {
+export async function getRestaurant() {
+    const sessionCookie = (await cookies()).get("auth_session");
+    if (restCookie !== sessionCookie) {
+        restname = null;
+    }
+    if (!restname) {
+        const client = await getMongoClient();
+        const db = client.db("data");
+        const session = await db.collection("sessions").findOne(
+            { _id: sessionCookie.value }
+        )
+        const user = await db.collection("users").findOne(
+            { _id: session.user_id }
+        )
+        restname = user.username;
+        restCookie = sessionCookie;
+    }
+
+    return restname;
+}
+
+export async function getRestDetails() {
     try {
+        const restname = await getRestaurant();
+        return restname;
+
+    } catch {
+
+    }
+}
+
+
+export async function storeNewItem(name, price, category, description, url, allergens) {
+    try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
 
@@ -48,8 +85,9 @@ export async function storeNewItem(restname, name, price, category, description,
     }
 }
 
-export async function View(restname, _id, seen) {
+export async function View(_id, seen) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         return await db.collection(restname).updateOne(
@@ -66,8 +104,9 @@ export async function View(restname, _id, seen) {
     }
 }
 
-export async function getCategories(restname) {
+export async function getCategories() {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         const result = await db.collection(`${restname} Data`).findOne({ categories: { $exists: true } }, { projection: { categories: 1, _id: 0 } });
@@ -78,8 +117,10 @@ export async function getCategories(restname) {
     }
 }
 
-export async function getItems(restname) {
+export async function getItems() {
+
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         const items = await db.collection(restname).find({}).sort({ order: 1 }).toArray();
@@ -91,8 +132,10 @@ export async function getItems(restname) {
 }
 
 
-export async function newCategory(restname, category) {
+
+export async function newCategory(category) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         return await db.collection(`${restname} Data`).updateOne(
@@ -109,8 +152,9 @@ export async function newCategory(restname, category) {
 }
 
 
-export async function deleteCategory(restname, category) {
+export async function deleteCategory(category) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const CATEGORIES = await getCategories(restname);
         const updatedCATEGORIES = CATEGORIES.categories.filter(c => c.name !== category.name);
@@ -126,57 +170,59 @@ export async function deleteCategory(restname, category) {
     }
 }
 
-export async function categoryElevate(restname, category) {
+export async function categoryElevate(category) {
     const swapCategories = (arr, index1, index2) => {
         [arr[index1], arr[index2]] = [arr[index2], arr[index1]];
     }
 
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const result = await getCategories(restname);
-        const categories = result.categories; 
-        
+        const categories = result.categories;
+
         const index = categories.findIndex(c => c.name === category.name);
         if (index <= 0) {
-            return; 
+            return;
         }
-        
+
         swapCategories(categories, index, index - 1);
-        
+
         const db = client.db("restaurant");
         await db.collection(`${restname} Data`).updateOne(
             { categories: { $exists: true } },
             { $set: { categories: categories } }
         );
-            } catch (error) {
+    } catch (error) {
         console.error('Error elevating category:', error);
         throw error;
     }
 }
 
-export async function categoryLower(restname, category) {
+export async function categoryLower(category) {
     const swapCategories = (arr, index1, index2) => {
         [arr[index1], arr[index2]] = [arr[index2], arr[index1]];
     }
 
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const result = await getCategories(restname);
-        const categories = result.categories; 
-        
+        const categories = result.categories;
+
         const index = categories.findIndex(c => c.name === category.name);
         if (index >= categories.length - 1) {
-            return; 
+            return;
         }
-        
+
         swapCategories(categories, index, index + 1);
-        
+
         const db = client.db("restaurant");
         await db.collection(`${restname} Data`).updateOne(
             { categories: { $exists: true } },
             { $set: { categories: categories } }
         );
-        
+
     } catch (error) {
         console.error('Error elevating category:', error);
         throw error;
@@ -184,8 +230,9 @@ export async function categoryLower(restname, category) {
 }
 
 
-export async function deleteOneItem(restname, id) {
+export async function deleteOneItem(id) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         return await db.collection(restname).deleteOne({ _id: new ObjectId(id) });
@@ -196,8 +243,9 @@ export async function deleteOneItem(restname, id) {
 }
 
 
-export async function updateCategory(restname, changedCategory, category) {
+export async function updateCategory(changedCategory, category) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         await db.collection(`${restname} Data`).updateOne(
@@ -227,8 +275,9 @@ export async function updateCategory(restname, changedCategory, category) {
 }
 
 
-export async function updateItem(restname, id, name, price, description, url, allergens, category) {
+export async function updateItem(id, name, price, description, url, allergens, category) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
         await db.collection(restname).updateOne(
@@ -253,8 +302,9 @@ export async function updateItem(restname, id, name, price, description, url, al
 }
 
 
-export async function handleUp(restname, item, items) {
+export async function handleUp(item, items) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
 
@@ -277,8 +327,9 @@ export async function handleUp(restname, item, items) {
     }
 }
 
-export async function handleDown(restname, item, items) {
+export async function handleDown(item, items) {
     try {
+        const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
 

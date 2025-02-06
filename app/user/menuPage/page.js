@@ -89,17 +89,17 @@ export default function MenuPage() {
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Your Menu</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">
-          View and manage your restaurant's menu items.
+          This is your menu, and this is how it will be shown for the clients.
         </p>
 
         <div className="mt-8 space-y-8">
         {CATEGORIES && CATEGORIES.length > 0 && (
           CATEGORIES.map((category) => {
-            const items = menu.filter((item) => item.category === category.name);            
+            const items = menu.filter((item) => item.category === category.name && item.seen === true);
             if (items.length === 0) return null;
 
             return (
-              <div key={category}>
+              <div key={category.name}>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {category.name}
                 </h2>
@@ -120,6 +120,9 @@ export default function MenuPage() {
                             width={150}
                             height={150}
                             className="w-20 h-20 object-cover rounded-lg"
+                            onError={(event) => {
+                              event.target.style.display = 'none';
+                            }}
                           />
                         )}
                         <div className="flex-1">

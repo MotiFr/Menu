@@ -64,7 +64,7 @@ export async function signUp(username, password, email, restaurantName, phone, l
         const updatedUser = await db.collection("users").findOne({ username: username });
         await createAuthSession(updatedUser._id);
         await createDummyItems(username);
-        await createDummyCategories(username);
+        await createDummyCategories(username, restaurantName);
         return response;
     } catch (error) {
         console.error('Error storing new user:', error);
@@ -269,11 +269,20 @@ const restaurantCategories = [
     }
 ];
 
-async function createDummyCategories(username) {
+async function createDummyCategories(username, restaurantName) {
     try {
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        db.collection(`${username} Data`).insertOne({categories: restaurantCategories})
+        const header = `Welcome to ${restaurantName}`;
+        db.collection(`${username} Data`).insertMany([
+            {
+                categories: restaurantCategories,
+                theme: "default",
+                description: "Welcome to our menu",
+                header: header
+            }
+        ]);
+        
         console.log("Successfully inserted menu categories");
     } catch (error) {
         console.error("Error inserting categories:", error);

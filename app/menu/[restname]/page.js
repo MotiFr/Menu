@@ -1,153 +1,90 @@
-"use client"
-import MenuItemDialog from "@/components/App/MenuItemDialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import MenuCard from "@/components/Menu/MenuCard";
+import ThemedBackground from "@/components/Menu/ThemeBG";
+import { getRestaurantsNames, getRestInfo } from "@/server/dbMenu";
+import { categoryClasses } from '@/components/Menu/Themes';
 
-
-export default function Menu({ params }) {
-    const [menu, setMenu] = useState([]);
-    const [CATEGORIES, setCATEGORIES] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const { restname } = useParams();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`/api/menu?restname=${encodeURIComponent(restname)}`, {
-                    method: 'GET',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                  });
-                  
-                const json = await response.json();
-                setCATEGORIES(json.categories);
-                setMenu(json.items);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    const skeletonItems = Array.from({ length: 4 });
-    if (loading) return (
-        <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">welcome to {restname}</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
-                View and manage your restaurant's menu items.
-            </p>
-            <div className="container mx-auto px-4 py-8">
-                <div className="space-y-8">
-                    <div>
-                        <Skeleton className="h-8 w-48 mb-4" />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {skeletonItems.map((_, index) => (
-                                <div
-                                    key={index}
-                                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <div className="flex items-start space-x-4">
-                                        <Skeleton className="w-20 h-20 rounded-lg" />
-                                        <div className="flex-1 space-y-2">
-                                            <Skeleton className="h-6 w-3/4" />
-                                            <Skeleton className="h-4 w-full" />
-                                            <Skeleton className="h-4 w-2/3" />
-                                            <Skeleton className="h-5 w-16 mt-2" />
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-
-
-
-    if (error) return <div>Error: {error.message}</div>;
-
-    const handleItemClick = (item) => {
-        setSelectedItem(item);
-        setIsDialogOpen(true);
-    };
-
-    return (
-        <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome to {restname}'s Menu</h1>
-                <p className="mt-2 text-gray-600 dark:text-gray-300">
-                    View restaurant's menu items.
-                </p>
-
-                <div className="mt-8 space-y-8">
-                    {CATEGORIES && CATEGORIES.length > 0 && (
-                        CATEGORIES.map((category) => {
-                            const items = menu.filter((item) => item.category === category.name && item.seen === true);
-                            if (items.length === 0) return null;
-
-                            return (
-                                <div key={category}>
-                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                        {category.name}
-                                    </h2>
-                                    <div className="text-l text-gray-900 dark:text-white mb-4">{category.description}</div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {items.map((item) => (
-                                            item.seen ? (
-                                                <div
-                                                    key={item._id}
-                                                    onClick={() => handleItemClick(item)}
-                                                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow duration-200"
-                                                >
-                                                    <div className="flex items-start space-x-4">
-                                                        {item.url && (
-                                                            <Image
-                                                                src={item.url}
-                                                                alt={item.name}
-                                                                width={150}
-                                                                height={150}
-                                                                className="w-20 h-20 object-cover rounded-lg"
-                                                            />
-                                                        )}
-                                                        <div className="flex-1">
-                                                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                                                {item.name}
-                                                            </h3>
-                                                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                                                                {item.description}
-                                                            </p>
-                                                            <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
-                                                                ${item.price}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) : null
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        }))}
-                </div>
-            </div>
-
-            <MenuItemDialog
-                item={selectedItem}
-                isOpen={isDialogOpen}
-                onClose={() => setIsDialogOpen(false)}
-            />
-        </div>
-    );
+export async function generateStaticParams() {
+    const restnames = await getRestaurantsNames();
+    return restnames.map((restname) => ({
+        restname: restname.toString(),
+    }));
 }
+
+export async function generateMetadata({ params }) {
+    const restname = (await params).restname;
+    try {
+        return {
+            title: `${restname}'s Menu`,
+            description: `View ${restname}'s restaurant menu items`,
+        };
+    } catch (error) {
+        return {
+            title: 'Restaurant Menu',
+            description: 'View restaurant menu items',
+        };
+    }
+}
+
+export default async function Menu({ params }) {
+    const restname = (await params).restname;
+    try {
+        const response = await getRestInfo(restname);
+        const CATEGORIES = response.categories;
+        const theme = response.theme;
+        const header = response.header;
+        const description = response.description
+        const menu = response.items.map(item => ({
+            ...item,
+            _id: item._id.toString()
+        }));
+
+        return (
+            <div className="min-h-screen transition-all duration-500">
+              <ThemedBackground theme={theme} />
+              <div className="max-w-7xl mx-auto px-2 py-8">
+                <div className="text-center mb-8">
+                  <h1 className="text-4xl font-bold mb-4">{header}</h1>
+                  <p className="text-lg opacity-80">{description}</p>
+                </div>
+        
+                <div className="space-y-4">
+                  {CATEGORIES && CATEGORIES.length > 0 && (
+                    CATEGORIES.map((category) => {
+                      const items = menu.filter((item) => 
+                        item.category === category.name && item.seen === true
+                      );
+                      if (items.length === 0) return null;
+        
+                      return (
+                        <div
+                          key={category.name}
+                          className={`${categoryClasses[theme]} rounded-2xl border backdrop-blur-md p-2`}
+                        >
+                          <h2 className="text-2xl font-bold mb-2">{category.name}</h2>
+                          <p className="opacity-80 mb-8">{category.description}</p>
+                          <div className="space-y-2">
+                            <MenuCard items={items} theme={theme} />
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+    } catch (error) {
+        console.log(error)
+        return (
+            <div className="max-w-4xl mx-auto p-8">
+                <h1 className="text-2xl font-bold text-red-600">
+                    Error Loading Menu
+                </h1>
+                <p className="mt-2 text-gray-600">
+                    Unable to load menu items. Please try again later.
+                </p>
+            </div>
+        );
+    }
+}
+

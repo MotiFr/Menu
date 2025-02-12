@@ -31,6 +31,11 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         }
     }, [item]);
 
+    useEffect(() => {
+        setSubmission(<span></span>);
+
+    }, [formData])
+
     if (!item) return null;
 
     const handleInputChange = (e) => {
@@ -44,6 +49,8 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setSubmission(<span className="text-red-600"></span>);
+
 
         if (!formData.name) {
             setSubmission(<span className="text-red-600">Please enter a name</span>);
@@ -57,11 +64,19 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
             return;
         }
 
+        if (/[^0-9./\s]/.test(formData.price)) {
+            setSubmission(<span className="text-red-600">Please enter number for price</span>);
+            setLoading(false);
+            return;
+        }
+
         if (!formData.category) {
             setSubmission(<span className="text-red-600">Please enter a category</span>);
             setLoading(false);
             return;
         }
+        setSubmission(<span className="text-red-600"></span>);
+
 
         try {
             const selectedAllergens = formData.allergens
@@ -129,7 +144,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                             Price
                         </label>
                         <input
-                            type="number"
+                            type="text"
                             id="price"
                             name="price"
                             required

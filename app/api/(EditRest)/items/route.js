@@ -1,5 +1,5 @@
 import { verifyAuthSession } from "@/lib/auth";
-import { getCategories, getItems } from "@/server/dbRest";
+import { getCategories, getItemsThemeText } from "@/server/dbRest";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -10,10 +10,10 @@ export async function GET() {
     }
     
     try {
-        const items = await getItems();
+        const { theme, items, header, description } = await getItemsThemeText();
         const categoriesOb = await getCategories();
         const categories = categoriesOb.categories;
-        return NextResponse.json({ items, categories });
+        return NextResponse.json({ theme, items, header, description, categories });
     } catch (error) {
         return NextResponse.json(
             { message: "Failed to fetch items", error: error.message },

@@ -78,9 +78,9 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white relative">
         {category.name}
-        <span className="absolute right-10">
+        <span className="absolute right-0">
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger>
               <Ellipsis className="h-8 w-8" />

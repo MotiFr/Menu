@@ -1,5 +1,6 @@
 "use server";
 import { MongoClient, ObjectId } from "mongodb";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 
@@ -69,7 +70,7 @@ export async function storeNewItem(name, price, category, description, url, alle
 
         const newOrder = lastItem.length > 0 ? lastItem[0].order + 1 : 1;
 
-        return await db.collection(restname).insertOne({
+        const res = await db.collection(restname).insertOne({
             name,
             price,
             description,
@@ -79,6 +80,8 @@ export async function storeNewItem(name, price, category, description, url, alle
             order: newOrder,
             seen: true
         });
+        revalidatePath(`/menu/${restname}`)
+        return res;
     } catch (error) {
         console.error('Error storing new item:', error);
         throw error;
@@ -90,7 +93,7 @@ export async function View(_id, seen) {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        return await db.collection(restname).updateOne(
+        const res = await db.collection(restname).updateOne(
             { _id: new ObjectId(_id) },
             {
                 $set: {
@@ -98,6 +101,8 @@ export async function View(_id, seen) {
                 }
             }
         );
+        revalidatePath(`/menu/${restname}`)
+        return res
     } catch (error) {
         console.error('Error storing new item:', error);
         throw error;
@@ -131,6 +136,27 @@ export async function getItems() {
     }
 }
 
+export async function getItemsThemeText() {
+
+    try {
+        const restname = await getRestaurant();
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+        const items = await db.collection(restname).find({}).sort({ order: 1 }).toArray();
+        const object = await db.collection(`${restname} Data`)
+            .findOne(
+                { theme: { $exists: true } },
+            );
+        const theme = object.theme
+        const header = object.header
+        const description = object.description
+
+        return { theme, items, header, description };
+    } catch (error) {
+        console.error('Error getting items:', error);
+        throw error;
+    }
+}
 
 
 export async function newCategory(category) {
@@ -138,13 +164,15 @@ export async function newCategory(category) {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        return await db.collection(`${restname} Data`).updateOne(
+        const res = await db.collection(`${restname} Data`).updateOne(
             {},
             {
                 $push: { categories: category }
             },
             { upsert: true }
         );
+        revalidatePath(`/menu/${restname}`)
+        return res;
     } catch (error) {
         console.error('Error storing new item:', error);
         throw error;
@@ -164,6 +192,7 @@ export async function deleteCategory(category) {
         }, {
             $set: { categories: updatedCATEGORIES }
         });
+        revalidatePath(`/menu/${restname}`)
     } catch (error) {
         console.error('Error deleting item:', error);
         throw error;
@@ -193,6 +222,7 @@ export async function categoryElevate(category) {
             { categories: { $exists: true } },
             { $set: { categories: categories } }
         );
+        revalidatePath(`/menu/${restname}`)
     } catch (error) {
         console.error('Error elevating category:', error);
         throw error;
@@ -222,6 +252,7 @@ export async function categoryLower(category) {
             { categories: { $exists: true } },
             { $set: { categories: categories } }
         );
+        revalidatePath(`/menu/${restname}`)
 
     } catch (error) {
         console.error('Error elevating category:', error);
@@ -235,7 +266,9 @@ export async function deleteOneItem(id) {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        return await db.collection(restname).deleteOne({ _id: new ObjectId(id) });
+        const res = await db.collection(restname).deleteOne({ _id: new ObjectId(id) });
+        revalidatePath(`/menu/${restname}`)
+        return res;
     } catch (error) {
         console.error('Error deleting item:', error);
         throw error;
@@ -260,6 +293,7 @@ export async function updateCategory(changedCategory, category) {
                 arrayFilters: [{ "elem.name": category.name }]
             }
         );
+        revalidatePath(`/menu/${restname}`)
 
         await db.collection(restname).updateMany(
             { category: category.name },
@@ -293,6 +327,7 @@ export async function updateItem(id, name, price, description, url, allergens, c
                 }
             }
         );
+        revalidatePath(`/menu/${restname}`)
 
 
     } catch (error) {
@@ -308,11 +343,9 @@ export async function handleUp(item, items) {
         const client = await getMongoClient();
         const db = client.db("restaurant");
 
-        // Find the item to swap with
         const currentIndex = items.findIndex(i => i._id === item._id);
         const targetItem = items[currentIndex - 1];
 
-        // Swap order values
         await db.collection(restname).updateOne(
             { _id: new ObjectId(item._id) },
             { $set: { order: targetItem.order } }
@@ -321,6 +354,7 @@ export async function handleUp(item, items) {
             { _id: new ObjectId(targetItem._id) },
             { $set: { order: item.order } }
         );
+        revalidatePath(`/menu/${restname}`)
     } catch (error) {
         console.error('Error reordering item:', error);
         throw error;
@@ -333,11 +367,9 @@ export async function handleDown(item, items) {
         const client = await getMongoClient();
         const db = client.db("restaurant");
 
-        // Find the item to swap with
         const currentIndex = items.findIndex(i => i._id === item._id);
         const targetItem = items[currentIndex + 1];
 
-        // Swap order values
         await db.collection(restname).updateOne(
             { _id: new ObjectId(item._id) },
             { $set: { order: targetItem.order } }
@@ -346,6 +378,7 @@ export async function handleDown(item, items) {
             { _id: new ObjectId(targetItem._id) },
             { $set: { order: item.order } }
         );
+        revalidatePath(`/menu/${restname}`)
     } catch (error) {
         console.error('Error reordering item:', error);
         throw error;

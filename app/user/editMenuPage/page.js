@@ -187,6 +187,9 @@ export default function editMenuPage() {
     else if (enteredPrice === "") {
       setSubmission(<span className="text-red-600">Please enter a price</span>);
     }
+    else if (/[^0-9./\s]/.test(enteredPrice)) {
+      setSubmission(<span className="text-red-600">Please enter number for price</span>);
+    }
 
     else if (enteredCategory === "") {
       setSubmission(<span className="text-red-600">Please enter a category</span>);
@@ -290,10 +293,11 @@ export default function editMenuPage() {
                       Price
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       id="price"
                       value={enteredPrice}
                       onChange={(event) => setEnteredPrice(event.target.value)}
+                      placeholder="price 15 or 15/18 for sizes"
                       className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
                     />
                   </div>
@@ -450,7 +454,7 @@ export default function editMenuPage() {
                       CATEGORIES={CATEGORIES}
                     />
                     <div className="text-l text-gray-900 dark:text-white mb-4">{category.description}</div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       {Citems.map((item, index) => (
                         <div
                           key={item._id}

@@ -16,7 +16,7 @@ export default function NavDarkButton() {
 
         return <button
         onClick={() => setIsDark(!isDark)}
-        className="p-2 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-amber-500 rounded-full"
+        className="p-2 text-black hover:text-amber-600 dark:text-gray-300 dark:hover:text-amber-500 rounded-full"
         aria-label="Toggle dark mode"
       >
         {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}

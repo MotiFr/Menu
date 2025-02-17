@@ -1,33 +1,7 @@
 "use server";
-import { MongoClient } from "mongodb";
-import { getRestaurant } from "./dbRest";
+import { getMongoClient, getRestaurant } from "./dbRest";
 import { revalidatePath } from "next/cache";
 
-const uri = process.env.NEXT_ATLAS_URI;
-let client = null;
-let isConnected = false;
-
-export async function getMongoClient() {
-    if (!client) {
-        client = new MongoClient(uri, {
-            maxPoolSize: 10,
-            serverSelectionTimeoutMS: 5000,
-            socketTimeoutMS: 45000,
-        });
-    }
-
-    if (!isConnected) {
-        try {
-            await client.connect();
-            isConnected = true;
-        } catch (error) {
-            console.error('MongoDB connection error:', error);
-            throw new Error('Failed to connect to database');
-        }
-    }
-
-    return client;
-}
 
 export async function changeMenu(theme, header, description) {
     try {
@@ -47,6 +21,7 @@ export async function changeMenu(theme, header, description) {
         );
 
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
 
     } catch (error) {
         console.error('Error storing new item:', error);

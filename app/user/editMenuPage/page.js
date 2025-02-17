@@ -3,18 +3,65 @@ import DeleteDialog from "@/components/App/DeleteDialog";
 import EditMenuDialog from "@/components/App/EditMenuDialog";
 import { ArrowDown, ArrowUp, Eye, EyeOff, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CategoryDropDown, handleDown, handleUp, SkeletonEditMenu } from "./functions";
 import { showError } from "./errToast";
+import { useSearchParams } from 'next/navigation';
+
 
 
 export default function editMenuPage() {
+
+  const searchParams = useSearchParams();
+  const [currentLang, setCurrentLang] = useState('heb');
+  
+  useEffect(() => {
+    const langParam = searchParams.get('lang');
+    
+    if (langParam && (langParam === 'eng' || langParam === 'heb')) {
+      setCurrentLang(langParam);
+    } else {
+      const storedLang = localStorage.getItem('preferredLanguage');
+      if (storedLang && (storedLang === 'eng' || storedLang === 'heb')) {
+        setCurrentLang(storedLang);
+      }
+    }
+  }, [searchParams]);
+
+  const getLocalizedValue = (engValue, hebValue) => currentLang === 'eng' ? engValue : hebValue;
+  const isRTL = currentLang === 'heb';
+
 
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDelete, setisDelete] = useState(false);
   const [isLoadingEye, setIsLoadingEye] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [loadingPosition, setLoadingPosition] = useState(false);
+
+  const [items, setItems] = useState([]);
+  const [CATEGORIES, setCATEGORIES] = useState([])
+  const [refresh, setRefresh] = useState(false);
+  const [isItemVisible, setIsItemVisible] = useState(false);
+  const [isCatVisible, setIsCatVisible] = useState(false);
+  const [enteredName, setEnteredName] = useState("");
+  const [enteredPrice, setEnteredPrice] = useState("");
+  const [enteredCategory, setEnteredCategory] = useState("");
+  const [enteredDescription, setEnteredDescription] = useState("");
+  const [enteredURL, setEnteredURL] = useState("");
+  const [enteredAllergens, setEnteredAllergens] = useState("")
+  const [enteredCatName, setEnteredCatName] = useState("")
+  const [enteredCatDescription, setEnteredCatDescription] = useState("")
+  const [enteredFile, setEnteredFile] = useState("")
+
+
+  const [submission, setSubmission] = useState("");
+  const [submissionCat, setSubmissionCat] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const fileInputRef = useRef(null);
 
 
   const handleItemClick = (item) => {
@@ -54,14 +101,6 @@ export default function editMenuPage() {
     }
   }
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [loadingPosition, setLoadingPosition] = useState(false);
-
-  const [items, setItems] = useState([]);
-  const [CATEGORIES, setCATEGORIES] = useState([])
-  const [refresh, setRefresh] = useState(false);
-
 
   const redirect = useCallback(() => {
     window.location.href = '/';
@@ -88,23 +127,6 @@ export default function editMenuPage() {
   }, [refresh]);
 
 
-  const [isItemVisible, setIsItemVisible] = useState(false);
-  const [isCatVisible, setIsCatVisible] = useState(false);
-  const [enteredName, setEnteredName] = useState("");
-  const [enteredPrice, setEnteredPrice] = useState("");
-  const [enteredCategory, setEnteredCategory] = useState("");
-  const [enteredDescription, setEnteredDescription] = useState("");
-  const [enteredURL, setEnteredURL] = useState("");
-  const [enteredAllergens, setEnteredAllergens] = useState("")
-  const [enteredCatName, setEnteredCatName] = useState("")
-  const [enteredCatDescription, setEnteredCatDescription] = useState("")
-
-
-  const [submission, setSubmission] = useState("");
-  const [submissionCat, setSubmissionCat] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-
   if (loading) {
     return (
       <SkeletonEditMenu />
@@ -118,17 +140,17 @@ export default function editMenuPage() {
     setIsSubmitting(true)
     setSubmissionCat("")
     if (enteredCatName === "") {
-      setSubmissionCat(<span className="text-red-600">Please enter a name</span>);
+      setSubmissionCat(<span className="text-red-600">{getLocalizedValue("Please enter a name", "בבקשה הכנס שם")}</span>);
       setIsSubmitting(false)
       return;
     }
     if (enteredCatName.length > 50) {
-      setSubmissionCat(<span className="text-red-600">Category name is too long.</span>);
+      setSubmissionCat(<span className="text-red-600">{getLocalizedValue("Category name is too long", "שם הקטגוריה ארוך מדי")}</span>);
       setIsSubmitting(false)
       return;
     }
     if (enteredCatDescription.length > 500) {
-      setSubmissionCat(<span className="text-red-600">Category description is too long.</span>);
+      setSubmissionCat(<span className="text-red-600">{getLocalizedValue("Category description is too long", "תיאור הקטגוריה ארוך מדי")}</span>);
       setIsSubmitting(false)
       return;
     }
@@ -140,7 +162,8 @@ export default function editMenuPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            category: { name: enteredCatName, description: enteredCatDescription }
+            category: { name: enteredCatName, description: enteredCatDescription },
+            isRTL: isRTL
           }),
         });
 
@@ -148,7 +171,7 @@ export default function editMenuPage() {
 
 
         if (response.ok) {
-          setSubmissionCat(<span className="text-green-600">Successfully added a category.</span>);
+          setSubmissionCat(<span className="text-green-600">{getLocalizedValue("Successfully added a category", "קטגוריה חדשה נוספה")}</span>);
           setIsSubmitting(false)
           setEnteredCatDescription("")
           setEnteredCatName("")
@@ -164,7 +187,7 @@ export default function editMenuPage() {
         setIsSubmitting(false)
       }
     } else {
-      setSubmissionCat(<span className="text-red-600">Category already exists.</span>);
+      setSubmissionCat(<span className="text-red-600">{getLocalizedValue("Category already exists", "קטגוריה כבר קיימת")}</span>);
       setIsSubmitting(false)
     }
   }
@@ -173,43 +196,83 @@ export default function editMenuPage() {
     event.preventDefault();
     setSubmission("")
 
-    let selectedAllergens = "";
+    let selectedAllergens = [];
 
     if (enteredAllergens !== "") {
       selectedAllergens = enteredAllergens.split(',').map(item => item.trim()).filter(item => item !== '');
+      for (let allergen of selectedAllergens) {
+        if (allergen.length > 30) {
+          setSubmission(<span className="text-red-600">{getLocalizedValue(`${allergen} is too long. Each should be 30 characters or fewer and separated by comma` , `${allergen} ארוך מדי צריך להיות פחות מ30 תווים כל אחד ומופרדים על ידי פסיק`)}</span>);
+          return;
+        }
+      }
+    }
+
+    if (enteredFile) {
+      const fileType = enteredFile.type;
+      if (fileType !== "image/jpeg" && fileType !== "image/png") {
+        setSubmission(<span className="text-red-600">{getLocalizedValue("Please upload a JPEG or PNG image", "קבצי JPEG או PNG ")}</span>);
+        return;
+      }
     }
 
 
     if (enteredName === "") {
-      setSubmission(<span className="text-red-600">Please enter a name</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a name", "בבקשה הכנס שם")}</span>);
     }
 
     else if (enteredPrice === "") {
-      setSubmission(<span className="text-red-600">Please enter a price</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a price" , "בבקשה הכנס מחיר")}</span>);
     }
     else if (/[^0-9./\s]/.test(enteredPrice)) {
-      setSubmission(<span className="text-red-600">Please enter number for price</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter number for price" , "הכנס מספר במחיר")}</span>);
     }
 
     else if (enteredCategory === "") {
-      setSubmission(<span className="text-red-600">Please enter a category</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a category", "בבקשה בחר קטגוריה")}</span>);
     }
     else if (enteredName.length > 100) {
-      setSubmission(<span className="text-red-600">Item name is too long.</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Item name is too long", "שם ארוך מדי")}</span>);
     }
     else if (enteredDescription.length > 500) {
-      setSubmission(<span className="text-red-600">Item description is too long.</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Item description is too long", "תיאור ארוך מדי")}</span>);
     }
     else if (enteredPrice.length > 50) {
-      setSubmission(<span className="text-red-600">Price is too long.</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Price is too long" , "מחיר ארוך מדי")}</span>);
     }
-    else if (setEnteredAllergens.length > 500) {
-      setSubmission(<span className="text-red-600">Allergens are too long.</span>);
+    else if (enteredAllergens.length > 500) {
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Additional comments are too long", "הערות נוספות יותר מדי ארוך")}</span>);
     }
+    else if (enteredFile && enteredURL !== "") {
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter image or image url", "הכנס או קובץ או קישור")}</span>);
+    }
+
 
 
     else {
       setIsSubmitting(true)
+      let imageUrl = "";
+
+      if (enteredFile) {
+        const formData = new FormData();
+        formData.append('image', enteredFile);
+
+        const uploadResponse = await fetch('/api/uploadImage', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          setSubmission(<span className="text-red-600">Failed to upload image, please try again later.</span>);
+        }
+
+        const uploadData = await uploadResponse.json();
+        imageUrl = uploadData.url;
+      }
+
+      if (imageUrl == "") {
+        imageUrl = enteredURL;
+      }
 
 
       try {
@@ -223,8 +286,9 @@ export default function editMenuPage() {
             price: enteredPrice,
             category: enteredCategory,
             description: enteredDescription,
-            url: enteredURL,
-            allergens: selectedAllergens
+            url: imageUrl,
+            allergens: selectedAllergens,
+            isRTL: isRTL
           }),
         });
 
@@ -232,52 +296,62 @@ export default function editMenuPage() {
 
 
         if (response.ok) {
-          setSubmission(<span className="text-green-600">Successfully added an item.</span>);
+          setSubmission(<span className="text-green-600">{getLocalizedValue("Successfully added an item" , "פריט נוסף בהצלחה")}</span>);
           setEnteredName("")
           setEnteredPrice("")
           setEnteredCategory("")
           setEnteredURL("")
           setEnteredDescription("")
           setEnteredAllergens("")
+          setEnteredFile("")
           setIsSubmitting(false)
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
           setRefresh(prev => !prev);
         }
         else {
           setSubmission(<span className="text-red-600">Failed, please try again later.</span>);
+          setIsSubmitting(false)
+
         }
 
       } catch (error) {
         setSubmission(<span className="text-red-600">Failed, please try again later.</span>);
+        setIsSubmitting(false)
+
       }
     }
 
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto" dir={isRTL ? "rtl" : ""}>
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Menu</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{getLocalizedValue("Edit Menu", "ערוך תפריט")}</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">
-          Here you can see all your items and categories, edit and remove them.
+          {getLocalizedValue("Here you can see all your items and categories, edit and remove them.", "פה ניתן לראות ולערוך את כל הפריטים והקטגוריות.")}
         </p>
         <div className="pt-10"></div>
         <div className="max-w-4xl mx-auto">
           <button
             onClick={() => setIsItemVisible(!isItemVisible)}
-            className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
+            className={`${loading ? `cursor-not-allowed` : ``} w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200`}
           >
-            Add Item
+            {getLocalizedValue("Add Item" , "הוסף פריט")}
           </button>
 
           {isItemVisible && (
-            <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add an item to your menu</h1>
+            <div className="bg-white dark:bg-gray-800 shadow-sm p-8" >
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {getLocalizedValue("Add an item to your menu", "הוסף פריט לתפריט")}
+              </h1>
 
               <form className="mt-8 space-y-6" onSubmit={submitForm}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                   <div className="relative">
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Item Name
+                     {getLocalizedValue("Item Name" , "שם הפריט")}
                     </label>
                     <input
                       type="text"
@@ -290,22 +364,21 @@ export default function editMenuPage() {
 
                   <div className="relative">
                     <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Price
+                      {getLocalizedValue("Price", "מחיר")}
                     </label>
                     <input
                       type="text"
                       id="price"
                       value={enteredPrice}
                       onChange={(event) => setEnteredPrice(event.target.value)}
-                      placeholder="price 15 or 15/18 for sizes"
+                      placeholder={getLocalizedValue("e.g. 15 or 15 / 18 for sizes", "לדוגמה 15 או 15 / 18 לגדלים")}
                       className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
                     />
                   </div>
 
                   <div className="relative">
                     <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Category
-
+                      {getLocalizedValue("Choose category", "בחר קטגוריה")}
                     </label>
                     <select
                       id="category"
@@ -314,35 +387,50 @@ export default function editMenuPage() {
                       onChange={(event) => setEnteredCategory(event.target.value)}
                       className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
                     >
-                      <option value="">--Select a category--</option>
+                      <option value="">{getLocalizedValue("--Select a category--", "--בחר קטגוריה--")}</option>
                       {CATEGORIES.map((category) => (
                         <option key={category.name} value={category.name}>
-                          {category.name}
+                          {getLocalizedValue(category.name_eng, category.name_heb)}
                         </option>
                       ))}
                     </select>
                   </div>
                   {CATEGORIES.length === 0 && (<div>
                     <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                      No categories added yet. Start by adding your first category below.
+                  {getLocalizedValue("No categories added yet. Start by adding your first category below.", "עדיין אין קטגוריות התחל בלהוסיף אחת למטה")}
                     </p>
                   </div>)}
 
                   <div className="relative">
                     <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Image URL
+                      {getLocalizedValue("Image URL (optional)", "קישור לתמונה (לא חובה)")}
                     </label>
                     <input
+                      value={enteredURL}
                       onChange={(event) => setEnteredURL(event.target.value)}
                       type="url"
                       id="image"
                       className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
                     />
+
+                    <label htmlFor="file" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-2">
+                      {getLocalizedValue("Upload Image (optional)" , "העלאת תמונה כקובץ (לא חובה)")}
+                    </label>
+                    <input
+                      ref={fileInputRef}
+                      onChange={(event) => setEnteredFile(event.target.files[0])}
+                      type="file"
+                      id="file"
+                      accept="image/png, image/jpeg"
+                      className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
+                    />
                   </div>
+
+
 
                   <div className="md:col-span-2">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Description
+                      {getLocalizedValue("Description (optional)" , "תיאור (לא חובה)")}
                     </label>
                     <textarea
                       id="description"
@@ -355,14 +443,14 @@ export default function editMenuPage() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="allergens" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Allergens (comma-separated)
+                      {getLocalizedValue("Allergens, Additional comments, (comma-separated) (optional)", "אלרגיות והערות נוספות (כל הערה מופרדת בפסיק) (לא חובה)")}
                     </label>
                     <input
                       onChange={(event) => setEnteredAllergens(event.target.value)}
                       value={enteredAllergens}
                       type="text"
                       id="allergens"
-                      placeholder="e.g., gluten, nuts, dairy"
+                      placeholder={getLocalizedValue("e.g., gluten, nuts, spicy", "לדוגמה: מכיל גלוטן, חריף")}
                       className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
                     />
                   </div>
@@ -379,7 +467,7 @@ export default function editMenuPage() {
                     type="submit"
                     className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200 cursor-not-allowed` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
                   >
-                    {isSubmitting ? 'Adding...' : 'Add Item'}
+                    {isSubmitting ? getLocalizedValue("Adding...", "...מוסיף") : getLocalizedValue("Add Item", "הוסף פריט")}
                   </button>
                 </div>
               </form>
@@ -390,17 +478,17 @@ export default function editMenuPage() {
             onClick={() => setIsCatVisible(!isCatVisible)}
             className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
           >
-            Add Category
+            {getLocalizedValue("Add Category", "הוסף קטגוריה")}
           </button>
           {isCatVisible && (
             <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add category to your menu</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{getLocalizedValue("Add category to your menu", "הוסף קטגוריה לתפריט")}</h1>
 
               <form className="mt-8 space-y-6" onSubmit={submitCategory}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="relative">
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Category name
+                      {getLocalizedValue("Category name", "שם הקטגוריה")}
                     </label>
                     <input
                       type="text"
@@ -411,7 +499,7 @@ export default function editMenuPage() {
                     />
                     <div className="relative mt-4">
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Category description
+                        {getLocalizedValue("Category description", "תיאור הקטגוריה")}
                       </label>
                       <textarea
                         type="text"
@@ -434,7 +522,7 @@ export default function editMenuPage() {
                     type="submit"
                     className={`w-36 max-h-12 px-6 py-3 h-12 text-sm font-medium text-white ${isSubmitting ? `bg-amber-200 cursor-not-allowed` : `bg-primary dark:bg-primary-dark`} rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200`}
                   >
-                    {isSubmitting ? 'Adding...' : 'Add Category'}
+                    {isSubmitting ? getLocalizedValue("Adding...", "...מוסיף") : getLocalizedValue("Add Category", "הוסף קטגוריה")}
                   </button>
                 </div>
               </form>
@@ -444,16 +532,18 @@ export default function editMenuPage() {
           <div className="mt-8 space-y-8">
             {CATEGORIES && CATEGORIES.length > 0 ? (
               CATEGORIES.map((category, indexer) => {
-                const Citems = items.filter((item) => item.category === category.name);
+                const Citems = items.filter((item) => item.category === category.name_eng);
                 return (
-                  <div key={category.name}>
+                  <div key={category.name_eng}>
                     <CategoryDropDown
                       setRefresh={setRefresh}
                       category={category}
                       indexer={indexer}
                       CATEGORIES={CATEGORIES}
+                      getLocalizedValue={getLocalizedValue}
+                      isRTL={isRTL}
                     />
-                    <div className="text-l text-gray-900 dark:text-white mb-4">{category.description}</div>
+                    <div className="text-l text-gray-900 dark:text-white mb-4">{getLocalizedValue(category.description_eng, category.description_heb)}</div>
                     <div className="grid grid-cols-1 gap-4">
                       {Citems.map((item, index) => (
                         <div
@@ -511,32 +601,33 @@ export default function editMenuPage() {
                             </button>
                           </div>
 
-                          <div className="flex items-start space-x-4 pl-12 pr-12">
+                          <div className="flex items-start space-x-4 pl-6 pr-12" >
                             {item.url && (
                               <Image
                                 src={item.url}
                                 alt={item.name}
                                 width={150}
                                 height={150}
-                                className="w-20 h-20 object-cover rounded-lg"
+                                className={`w-20 h-20 object-cover rounded-lg ${isRTL ? `order-last` : ``}`}
+                                
                               />
                             )}
                             <div className="flex-1">
-                              <h3 className={item.seen ? `text-lg font-medium text-black dark:text-white` : `text-lg font-medium text-gray-500 dark:text-gray-400`}>
-                                {item.name}
+                              <h3 className={item.seen ? `text-lg font-medium text-black dark:text-white line-clamp-1` : `line-clamp-1 text-lg font-medium text-gray-500 dark:text-gray-400`}>
+                                {getLocalizedValue(item.name_eng, item.name_heb)}
                               </h3>
-                              <p className={item.seen ? `mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2` : `mt-1 text-sm text-gray-400 dark:text-gray-400 line-clamp-1`}>
-                                {item.description}
+                              <p className={item.seen ? `mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1` : `mt-1 text-sm text-gray-400 dark:text-gray-400 line-clamp-1`}>
+                                {getLocalizedValue(item.description_eng, item.description_heb)}
                               </p>
-                              <div className="absolute bottom-2 right-12">
-                              <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
-                                {item.price}
-                              </p>
+                              <div className={getLocalizedValue("absolute bottom-2 right-12", "absolute bottom-2 left-32")}>
+                                <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
+                                  {item.price}
+                                </p>
                               </div>
 
                               {items.length === 0 && (
                                 <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                                  No items added yet. Start by adding your first menu item above.
+                                  {getLocalizedValue("No items added yet. Start by adding your first menu item above", "עדיין לא נוספו פריטים. התחל להוסיף את הפריט הראשון שלך בתפריט למעלה")}
                                 </p>
                               )}
                             </div>
@@ -549,7 +640,7 @@ export default function editMenuPage() {
               })
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                No items added yet. Start by adding your first menu item above.
+                {getLocalizedValue("No items added yet. Start by adding your first menu item above", "עדיין לא נוספו פריטים. התחל להוסיף את הפריט הראשון שלך בתפריט למעלה")}
               </p>
             )}
           </div>
@@ -561,6 +652,8 @@ export default function editMenuPage() {
           item={selectedItem}
           isOpen={isDelete}
           onClose={() => setisDelete(false)}
+          getLocalizedValue={getLocalizedValue}
+          isRTL={isRTL}
         />
         <EditMenuDialog
           setRefresh={setRefresh}
@@ -568,6 +661,8 @@ export default function editMenuPage() {
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           CATEGORIES={CATEGORIES}
+          getLocalizedValue={getLocalizedValue}
+          isRTL={isRTL}
         />
       </div>
     </div>

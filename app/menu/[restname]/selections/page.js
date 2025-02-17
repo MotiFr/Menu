@@ -1,9 +1,26 @@
 import SelectionPage from "@/components/Menu/selectionPage";
-import { getTheme } from "@/server/dbMenu";
+import { getRestaurantsNames, getTheme } from "@/server/dbMenu";
 
-export default async function selections({ params }) {
+export async function generateStaticParams() {
+    const restnames = await getRestaurantsNames();
+    return restnames.map((restname) => ({
+        restname: restname.toString(),
+    }));
+}
+
+export default async function selections({ params, searchParams }) {
     const restname = (await params).restname
     const theme = await getTheme(restname)
-   
-    return <SelectionPage theme={theme.theme} />
+    const lang = (await searchParams).lang || "heb";
+    const isRTL = lang === 'heb';
+
+    return (
+        <>
+            <SelectionPage 
+            lang={lang}
+            isRTL={isRTL}
+            theme={theme.theme}
+            />
+        </>
+    )
 }

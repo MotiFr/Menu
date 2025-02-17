@@ -4,25 +4,168 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 
+
 const uri = process.env.NEXT_ATLAS_URI;
 
 let client = null;
 let isConnected = false;
 let restname = null;
 let restCookie = null;
+let connectionTimer = null;
+const IDLE_TIMEOUT = 60000;
 
 export async function getMongoClient() {
     if (!client) {
-        client = new MongoClient(uri);
+        client = new MongoClient(uri, {
+            maxPoolSize: 50,
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 60000,
+        });
     }
 
     if (!isConnected) {
-        await client.connect();
-        isConnected = true;
+        try {
+            await client.connect();
+            isConnected = true;
+        } catch (error) {
+            console.error('MongoDB connection error:', error);
+            throw new Error('Failed to connect to database');
+        }
     }
+
+    if (connectionTimer) {
+        clearTimeout(connectionTimer);
+    }
+
+    connectionTimer = setTimeout(async () => {
+        if (client && isConnected) {
+            try {
+                await client.close();
+                isConnected = false;
+                client = null;
+                connectionTimer = null;
+            } catch (error) {
+                console.error('Error closing idle connection:', error);
+            }
+        }
+    }, IDLE_TIMEOUT);
 
     return client;
 }
+
+
+export async function translateText(text, sourceLang, targetLang) {
+    if (!text) return '';
+    
+    const from = sourceLang === 'eng' ? 'en' : 'iw'; 
+    const to = targetLang === 'eng' ? 'en' : 'iw';
+  
+    try {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0',
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      
+      if (data && data[0]) {
+        return data[0]
+          .map(segment => segment[0])
+          .filter(Boolean)
+          .join(' ');
+      }
+  
+      throw new Error('No translation data received');
+    } catch (error) {
+      console.error('Translation error:', {
+        message: error.message,
+        status: error?.status,
+        data: error?.data
+      });
+      
+      return text;
+    }
+  }
+
+
+
+
+export async function storeNewItem(name, price, category, description, url, allergens, isRTL) {
+    try {
+        const restname = await getRestaurant();
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+
+        let name_eng, name_heb, description_eng, description_heb;
+
+        if (isRTL) {
+            name_heb = name;
+            description_heb = description;
+            name_eng = await translateText(name, 'heb', 'eng');
+            description_eng = await translateText(description, 'heb', 'eng');
+        } else {
+            name_eng = name;
+            description_eng = description;
+            name_heb = await translateText(name, 'eng', 'heb');
+            description_heb = await translateText(description, 'eng', 'heb');
+        }
+
+        const translatedAllergens = await Promise.all(
+            allergens.map(async (allergen) => {
+                if (typeof allergen === 'string') {
+                    if (isRTL) {
+                        const engText = await translateText(allergen, 'heb', 'eng');
+                        return { eng: engText, heb: allergen };
+                    } else {
+                        const hebText = await translateText(allergen, 'eng', 'heb');
+                        return { eng: allergen, heb: hebText };
+                    }
+                } else if (typeof allergen === 'object') {
+                    return allergen;
+                }
+            })
+        );
+
+        const lastItem = await db.collection(restname)
+            .find()
+            .sort({ order: -1 })
+            .limit(1)
+            .toArray();
+
+        const newOrder = lastItem.length > 0 ? lastItem[0].order + 1 : 1;
+
+        const res = await db.collection(restname).insertOne({
+            name_eng,
+            name_heb,
+            description_eng,
+            description_heb,
+            price,
+            category,
+            url,
+            allergens: translatedAllergens,
+            order: newOrder,
+            seen: true
+        });
+
+        revalidatePath(`/menu/${restname}`);
+        revalidatePath(`/menu/${restname}/selections`);
+        return res;
+    } catch (error) {
+        console.error('Error storing new item:', error);
+        throw error;
+    }
+}
+
+
 
 export async function getRestaurant() {
     const sessionCookie = (await cookies()).get("auth_session");
@@ -56,37 +199,6 @@ export async function getRestDetails() {
 }
 
 
-export async function storeNewItem(name, price, category, description, url, allergens) {
-    try {
-        const restname = await getRestaurant();
-        const client = await getMongoClient();
-        const db = client.db("restaurant");
-
-        const lastItem = await db.collection(restname)
-            .find()
-            .sort({ order: -1 })
-            .limit(1)
-            .toArray();
-
-        const newOrder = lastItem.length > 0 ? lastItem[0].order + 1 : 1;
-
-        const res = await db.collection(restname).insertOne({
-            name,
-            price,
-            description,
-            category,
-            url,
-            allergens,
-            order: newOrder,
-            seen: true
-        });
-        revalidatePath(`/menu/${restname}`)
-        return res;
-    } catch (error) {
-        console.error('Error storing new item:', error);
-        throw error;
-    }
-}
 
 export async function View(_id, seen) {
     try {
@@ -102,6 +214,7 @@ export async function View(_id, seen) {
             }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
         return res
     } catch (error) {
         console.error('Error storing new item:', error);
@@ -159,7 +272,22 @@ export async function getItemsThemeText() {
 }
 
 
-export async function newCategory(category) {
+export async function newCategory(category, isRTL) {
+
+    let name_eng, name_heb, description_eng, description_heb;
+
+        if (isRTL) {
+            name_heb = category.name;
+            description_heb = category.description;
+            name_eng = await translateText(category.name, 'heb', 'eng');
+            description_eng = await translateText(category.description, 'heb', 'eng');
+        } else {
+            name_eng = category.name;
+            description_eng = category.description;
+            name_heb = await translateText(category.name, 'eng', 'heb');
+            description_heb = await translateText(category.description, 'eng', 'heb');
+        }
+
     try {
         const restname = await getRestaurant();
         const client = await getMongoClient();
@@ -167,11 +295,18 @@ export async function newCategory(category) {
         const res = await db.collection(`${restname} Data`).updateOne(
             {},
             {
-                $push: { categories: category }
+                $push: { categories: {
+                    name: name_eng,
+                    name_eng,
+                    name_heb,
+                    description_eng,
+                    description_heb,
+                } }
             },
             { upsert: true }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
         return res;
     } catch (error) {
         console.error('Error storing new item:', error);
@@ -193,6 +328,7 @@ export async function deleteCategory(category) {
             $set: { categories: updatedCATEGORIES }
         });
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
     } catch (error) {
         console.error('Error deleting item:', error);
         throw error;
@@ -223,6 +359,7 @@ export async function categoryElevate(category) {
             { $set: { categories: categories } }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
     } catch (error) {
         console.error('Error elevating category:', error);
         throw error;
@@ -253,6 +390,7 @@ export async function categoryLower(category) {
             { $set: { categories: categories } }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
 
     } catch (error) {
         console.error('Error elevating category:', error);
@@ -268,6 +406,8 @@ export async function deleteOneItem(id) {
         const db = client.db("restaurant");
         const res = await db.collection(restname).deleteOne({ _id: new ObjectId(id) });
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
+
         return res;
     } catch (error) {
         console.error('Error deleting item:', error);
@@ -294,6 +434,8 @@ export async function updateCategory(changedCategory, category) {
             }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
+
 
         await db.collection(restname).updateMany(
             { category: category.name },
@@ -328,6 +470,7 @@ export async function updateItem(id, name, price, description, url, allergens, c
             }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
 
 
     } catch (error) {
@@ -355,6 +498,8 @@ export async function handleUp(item, items) {
             { $set: { order: item.order } }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
+
     } catch (error) {
         console.error('Error reordering item:', error);
         throw error;
@@ -379,6 +524,8 @@ export async function handleDown(item, items) {
             { $set: { order: item.order } }
         );
         revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
+
     } catch (error) {
         console.error('Error reordering item:', error);
         throw error;

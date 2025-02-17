@@ -4,10 +4,37 @@ import MenuItemDialog from "@/components/App/MenuItemDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation';
 import ThemedBackground from '@/components/Menu/ThemeBG';
 import { categoryClasses, menuItemClasses, themes } from '@/components/Menu/Themes';
 import AutoResizeTextarea from '@/components/Menu/TextareaSize';
 
+const translations = {
+  eng: {
+    chooseTheme: "Choose Your Theme",
+    editHeader: "Edit Header And Description By Clicking",
+    saveChanges: "Save changes",
+    headerTooLong: "Header is too long",
+    descTooLong: "Description is too long",
+    yourMenu: "Your Menu",
+    hebrewTitle: "Hebrew Title",
+    englishTitle: "English Title",
+    hebrewDesc: "Hebrew Description",
+    englishDesc: "English Description"
+  },
+  heb: {
+    chooseTheme: "בחר עיצוב",
+    editHeader: "לחץ על הכותרת ועל התיאור בשביל לערוך",
+    saveChanges: "שמור שינויים",
+    headerTooLong: "הכותרת ארוכה מדי",
+    descTooLong: "התיאור ארוך מדי",
+    yourMenu: "התפריט שלך",
+    hebrewTitle: "כותרת בעברית",
+    englishTitle: "כותרת באנגלית",
+    hebrewDesc: "תיאור בעברית",
+    englishDesc: "תיאור באנגלית"
+  }
+};
 
 const ThemeButton = ({ themeName, colors, isActive, onClick, setIsThemed }) => (
   <button
@@ -23,6 +50,23 @@ const ThemeButton = ({ themeName, colors, isActive, onClick, setIsThemed }) => (
 );
 
 export default function MenuPage() {
+  const searchParams = useSearchParams();
+  const [currentLang, setCurrentLang] = useState('heb');
+  
+  useEffect(() => {
+    const langParam = searchParams.get('lang');
+    
+    if (langParam && (langParam === 'eng' || langParam === 'heb')) {
+      setCurrentLang(langParam);
+    } else {
+      const storedLang = localStorage.getItem('preferredLanguage');
+      if (storedLang && (storedLang === 'eng' || storedLang === 'heb')) {
+        setCurrentLang(storedLang);
+      }
+    }
+  }, [searchParams]);
+  const t = translations[currentLang];
+
   const [currentTheme, setCurrentTheme] = useState('default');
   const [isThemed, setIsThemed] = useState(false);
   const [menu, setMenu] = useState([]);
@@ -31,10 +75,10 @@ export default function MenuPage() {
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [loadingChange, setLoadingChage] = useState(false)
-  const [menuTitle, setMenuTitle] = useState('');
-  const [menuDescription, setMenuDescription] = useState('');
-  const [errText, setErrText] = useState('')
+  const [loadingChange, setLoadingChage] = useState(false);
+  const [menuTitles, setMenuTitles] = useState({ heb: '', eng: '' });
+  const [menuDescriptions, setMenuDescriptions] = useState({ heb: '', eng: '' });
+  const [errText, setErrText] = useState('');
 
   const redirect = useCallback(() => {
     window.location.href = '/';
@@ -51,8 +95,14 @@ export default function MenuPage() {
         setCATEGORIES(json.categories);
         setMenu(json.items);
         setCurrentTheme(json.theme);
-        setMenuDescription(json.description);
-        setMenuTitle(json.header)
+        setMenuDescriptions({
+          heb: json.description.heb || '',
+          eng: json.description.eng || ''
+        });
+        setMenuTitles({
+          heb: json.header.heb || '',
+          eng: json.header.eng || ''
+        });
 
       } catch (err) {
         setError(err);
@@ -64,12 +114,9 @@ export default function MenuPage() {
     fetchData();
   }, [redirect]);
 
-
-
-
   if (loading) return (
     <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Your Menu</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t.yourMenu}</h1>
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           <Skeleton className="h-8 w-48 mb-4" />
@@ -101,17 +148,19 @@ export default function MenuPage() {
 
   async function handleChanges(event) {
     event.preventDefault();
-    setLoadingChage(true)
-    if (menuTitle.length > 150) {
-      setErrText("Header is too long");
-      setLoadingChage(false)
-      return
+    setLoadingChage(true);
+    
+    if (menuTitles.heb.length > 150 || menuTitles.eng.length > 150) {
+      setErrText(t.headerTooLong);
+      setLoadingChage(false);
+      return;
     }
-    if (menuDescription.length > 1500) {
-      setErrText("Description is too long");
-      setLoadingChage(false)
-      return
+    if (menuDescriptions.heb.length > 1500 || menuDescriptions.eng.length > 1500) {
+      setErrText(t.descTooLong);
+      setLoadingChage(false);
+      return;
     }
+
     try {
       const response = await fetch('/api/changeMenu', {
         method: 'POST',
@@ -120,88 +169,100 @@ export default function MenuPage() {
         },
         body: JSON.stringify({
           theme: currentTheme,
-          header: menuTitle,
-          description: menuDescription
+          header: {
+            heb: menuTitles.heb,
+            eng: menuTitles.eng
+          },
+          description: {
+            heb: menuDescriptions.heb,
+            eng: menuDescriptions.eng
+          }
         }),
       });
 
-      await response.json();
-
-
+      const result = await response.json();
       if (response.ok) {
-        setLoadingChage(false)
-        setIsThemed(false)
-      }
-      else {
-        setLoadingChage(false)
+        localStorage.setItem('header', JSON.stringify(result.header));
+        localStorage.setItem('description', JSON.stringify(result.description));
+        setLoadingChage(false);
+        setIsThemed(false);
+      } else {
+        setLoadingChage(false);
       }
 
     } catch (error) {
+      console.error('Error saving changes:', error);
+      setLoadingChage(false);
     }
   }
 
+  const textDirection = currentLang === 'heb' ? 'rtl' : 'ltr';
+
   return (
-    <div className="min-h-screen transition-all duration-500">
-      <ThemedBackground theme={currentTheme} />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Theme Selector */}
-        <div className="mb-8 p-6 rounded-xl bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/20 dark:border-black/20">
-          <h2 className="text-lg font-semibold mb-4 text-center">Choose Your Theme</h2>
-          <div className="flex flex-wrap justify-center gap-2">
-            {Object.entries(themes).map(([name, colors]) => (
-              <ThemeButton
-                key={name}
-                themeName={name}
-                colors={colors}
-                isActive={currentTheme === name}
-                onClick={setCurrentTheme}
-                setIsThemed={setIsThemed}
-              />
-            ))}
-
-          </div>
-
-          {/* Menu Header */}
-
-          <div className="text-center mb-12">
-            <h2 className="text-lg font-semibold mb-4 text-center mt-6">Edit Header And Description By Clicking</h2>
-            <form onSubmit={handleChanges}>
-              <div className="mb-4">
-                <AutoResizeTextarea
-                  type="text"
-                  className="bg-inherit text-4xl font-bold w-full text-center"
-                  placeholder="Header"
-                  value={menuTitle}
-                  onChange={e => (setMenuTitle(e.target.value), setIsThemed(true))}
+      <div className="min-h-screen transition-all duration-500" dir={textDirection}>
+        <ThemedBackground theme={currentTheme} />
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="mb-8 p-6 rounded-xl bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/20 dark:border-black/20">
+            <h2 className="text-lg font-semibold mb-4 text-center">{t.chooseTheme}</h2>
+            <div className="flex flex-wrap justify-center gap-2">
+              {Object.entries(themes).map(([name, colors]) => (
+                <ThemeButton
+                  key={name}
+                  themeName={name}
+                  colors={colors}
+                  isActive={currentTheme === name}
+                  onClick={setCurrentTheme}
+                  setIsThemed={setIsThemed}
                 />
-              </div>
-              <div>
-                <AutoResizeTextarea
-                  className="bg-inherit text-lg opacity-80 w-full text-center"
-                  placeholder="Description"
-                  value={menuDescription}
-                  onChange={e => (setMenuDescription(e.target.value), setIsThemed(true))}
-                />
-              </div>
-              <div className='w-full'>
-                {isThemed ?
-                  <button
-                    className={`absolute right-4 bottom-5 m-2 p-2 text-xs font-medium text-white rounded-lg shadow-lg transition-colors duration-200 ${loadingChange ? `bg-primary-light cursor-not-allowed` : `bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark `}`}
-                    type="submit"
-                  >
-                    Save changes
-                  </button>
-                  : null}
+              ))}
+            </div>
+  
+            <div className="text-center mb-12">
+              <h2 className="text-lg font-semibold mb-4 text-center mt-6">{t.editHeader}</h2>
+              <form onSubmit={handleChanges}>
+                <div className="space-y-4">
+                  <div className="mb-4">
+                    <AutoResizeTextarea
+                      className="bg-inherit text-4xl font-bold w-full text-center"
+                      placeholder={currentLang === 'heb' ? "כותרת בעברית" : "English Title"}
+                      value={menuTitles[currentLang]}
+                      onChange={e => {
+                        setMenuTitles(prev => ({ ...prev, [currentLang]: e.target.value }));
+                        setIsThemed(true);
+                      }}
+                      dir={currentLang === 'heb' ? 'rtl' : 'ltr'}
+                    />
+                  </div>
+  
+                  <div>
+                    <AutoResizeTextarea
+                      className="bg-inherit text-lg opacity-80 w-full text-center"
+                      placeholder={currentLang === 'heb' ? "תיאור בעברית" : "English Description"}
+                      value={menuDescriptions[currentLang]}
+                      onChange={e => {
+                        setMenuDescriptions(prev => ({ ...prev, [currentLang]: e.target.value }));
+                        setIsThemed(true);
+                      }}
+                      dir={currentLang === 'heb' ? 'rtl' : 'ltr'}
+                    />
+                  </div>
+                </div>
+  
+                <div className='w-full relative mt-14'>
+                  {isThemed && (
+                    <button
+                      className={`absolute right-4 bottom-5 m-2 p-2 text-xs font-medium text-white rounded-lg shadow-lg transition-colors duration-200 ${loadingChange ? 'bg-primary-light cursor-not-allowed' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
+                      type="submit"
+                    >
+                      {t.saveChanges}
+                    </button>
+                  )}
                   <div className='text-lg text-red-500'>{errText}</div>
-              </div>
-            </form>
+                </div>
+              </form>
+            </div>
           </div>
 
-        </div>
-
-
-
-        {/* Menu Categories */}
         <div className="space-y-8">
           {CATEGORIES && CATEGORIES.length > 0 && (
             CATEGORIES.map((category) => {
@@ -213,8 +274,8 @@ export default function MenuPage() {
                   key={category.name}
                   className={`${categoryClasses[currentTheme]} rounded-2xl border backdrop-blur-md p-2`}
                 >
-                  <h2 className="text-2xl font-bold mb-2">{category.name}</h2>
-                  <p className="opacity-80 mb-8">{category.description}</p>
+                  <h2 className="text-2xl font-bold mb-2">{category[`name_${currentLang}`]}</h2>
+                  <p className="opacity-80 mb-8">{category[`description_${currentLang}`]}</p>
 
                   <div className="space-y-2">
                     {items.map((item) => (
@@ -227,10 +288,10 @@ export default function MenuPage() {
                         >
                           <div className="flex items-center h-full p-4">
                             {item.url && (
-                              <div className="flex-shrink-0 w-20 h-20 relative">
+                              <div className={`flex-shrink-0 w-20 h-20 relative ${currentLang == "heb" ? 'order-last' : ''}`}>
                                 <Image
                                   src={item.url}
-                                  alt={item.name}
+                                  alt={item[`name_${currentLang}`]}
                                   fill
                                   className="rounded-lg object-cover"
                                   onError={(e) => {
@@ -241,10 +302,10 @@ export default function MenuPage() {
                             )}
                             <div className="flex-1 min-w-0 ml-6">
                               <div className="flex justify-between items-center mb-2">
-                                <h3 className="text-lg font-semibold truncate pr-4">{item.name}</h3>
-                                <span className="text-lg font-bold whitespace-nowrap">${item.price}</span>
+                                <h3 className="text-lg font-semibold truncate pr-4">{item[`name_${currentLang}`]}</h3>
+                                <span className="text-lg font-bold whitespace-nowrap">{item.price}</span>
                               </div>
-                              <p className="opacity-80 line-clamp-2 text-sm">{item.description}</p>
+                              <p className="opacity-80 line-clamp-2 text-sm">{item[`description_${currentLang}`]}</p>
                             </div>
                           </div>
                         </div>
@@ -263,6 +324,8 @@ export default function MenuPage() {
         item={selectedItem}
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
+        isRTL={textDirection === "rtl"}
+        lang={currentLang}
       />
     </div>
   );

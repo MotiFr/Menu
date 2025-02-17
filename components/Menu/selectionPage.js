@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import ThemedBackground from "@/components/Menu/ThemeBG";
 import { menuItemClasses, dialogClasses, priceClasses } from "./Themes";
 
-export default function SelectionPage({ theme = "default" }) {
+export default function SelectionPage({ theme = "default", lang, isRTL }) {
     const pathname = usePathname();
     const restaurantId = pathname.split('/')[2];
     const storageKey = `selections-${restaurantId}`;
@@ -22,6 +22,9 @@ export default function SelectionPage({ theme = "default" }) {
     const [selections, setSelections] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
+
 
     useEffect(() => {
         const selected = JSON.parse(localStorage.getItem(storageKey)) || [];
@@ -66,10 +69,10 @@ export default function SelectionPage({ theme = "default" }) {
         return (
             <div className={`min-h-[400px] flex flex-col items-center justify-center text-center p-8 ${menuItemClasses[theme]}`}>
                 <h2 className="text-2xl font-semibold mb-4">
-                    Your selections for this restaurant will appear here
+                    {getLocalizedValue("Your selections for this restaurant will appear here", "הבחירות שלך מתפריט המסעדה יופיעו כאן")}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                    Click on items from the menu to get started!
+                    {getLocalizedValue("Click on items from the menu to get started!", "לחץ על פריט בתפריט המסדעה להתחיל")}
                 </p>
             </div>
         );
@@ -78,9 +81,9 @@ export default function SelectionPage({ theme = "default" }) {
     return (
         <>
             <ThemedBackground theme={theme} />
-            <div className="max-w-4xl mx-auto p-6">
-                <h1 className={`text-2xl font-bold mb-6 ${priceClasses[theme]}`}>
-                    Your Selections
+            <div className="max-w-4xl mx-auto p-6" dir={isRTL ? 'rtl' : 'ltr'}>
+                <h1 className={`text-2xl font-bold mb-6 ${priceClasses[theme]}`} >
+                    {getLocalizedValue("Your Selections", "הבחירות שלך")}
                 </h1>
 
                 <div className="grid gap-2">
@@ -96,7 +99,7 @@ export default function SelectionPage({ theme = "default" }) {
                                 </div>
                                 <div className="flex items-center p-3">
                                     {item.url && (
-                                        <div className="relative w-20 h-20 flex-shrink-0">
+                                        <div className={`relative w-20 h-20 flex-shrink-0 ${isRTL ? 'order-last' : ''}`}>
                                             <Image
                                                 src={item.url}
                                                 alt={item.name}
@@ -105,19 +108,19 @@ export default function SelectionPage({ theme = "default" }) {
                                             />
                                         </div>
                                     )}
-                                    <div className="flex-1 ml-4">
+                                    <div className="flex-1 ml-4 mr-6">
                                         <div className="flex justify-between items-center">
                                             <div>
                                                 <h3 className={`text-lg font-semibold ${priceClasses[theme]}`}>
-                                                    {item.name}
+                                                    {getLocalizedValue(item.name_eng, item.name_heb)}
                                                 </h3>
                                                 <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
-                                                    {item.description}
+                                                    {getLocalizedValue(item.description_eng, item.description_heb)}
                                                 </p>
                                             </div>
                                             <div className="flex items-center space-x-4">
                                                 <p className={`text-lg font-semibold ${priceClasses[theme]}`}>
-                                                    ${item.price}
+                                                    {item.price}
                                                 </p>
                                                 <button
                                                     onClick={(e) => {
@@ -127,7 +130,7 @@ export default function SelectionPage({ theme = "default" }) {
                                                     className="text-gray-400 hover:text-red-500 transition-colors duration-200"
                                                     aria-label="Remove item"
                                                 >
-                                                    <Trash2 className="w-5 h-5 text-black dark:text-white hover:text-red-600" />
+                                                    <Trash2 className="absolute right-2 bottom-10 w-5 h-5 text-black dark:text-white hover:text-red-600" />
                                                 </button>
                                             </div>
                                         </div>
@@ -145,7 +148,7 @@ export default function SelectionPage({ theme = "default" }) {
                         <>
                             <DialogHeader>
                                 <DialogTitle className={priceClasses[theme]}>
-                                    {selectedItem.name}
+                                    {getLocalizedValue(selectedItem.name_eng, selectedItem.name_heb)}
                                 </DialogTitle>
                             </DialogHeader>
 
@@ -162,32 +165,31 @@ export default function SelectionPage({ theme = "default" }) {
                                 </div>
                             )}
 
-                            <div className="mt-4 max-h-48 overflow-y-auto">
+                            <div className="mt-4 max-h-48 overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'}>
                                 <p className="text-sm text-muted-foreground">
-                                    {selectedItem.description}
+                                    {getLocalizedValue(selectedItem.description_eng, selectedItem.description_heb)}
                                 </p>
                             </div>
 
                             {selectedItem.allergens?.length > 0 && (
-                                <div className="mt-4 space-y-2">
-                                    <h4 className="text-sm font-medium">Allergens:</h4>
+                                <div className="mt-4 space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedItem.allergens.map((allergen) => (
                                             <Badge
-                                                key={allergen}
+                                                key={allergen.eng}
                                                 variant="destructive"
                                                 className="text-xs"
                                             >
-                                                {allergen}
+                                                {isRTL ? allergen.heb : allergen.eng}
                                             </Badge>
                                         ))}
                                     </div>
                                 </div>
                             )}
 
-                            <div className="mt-6 text-right">
+                            <div className="mt-6" dir={isRTL ? 'ltr' : 'rtl'}>
                                 <p className={`text-xl font-bold ${priceClasses[theme]}`}>
-                                    ${selectedItem.price}
+                                    {selectedItem.price}
                                 </p>
                             </div>
                         </>

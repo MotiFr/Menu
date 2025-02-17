@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
-export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATEGORIES }) {
+export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATEGORIES, getLocalizedValue, isRTL }) {
     const [formData, setFormData] = useState({
         name: '',
         price: '',
@@ -21,15 +21,16 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
     useEffect(() => {
         if (item) {
             setFormData({
-                name: item.name || '',
+                name: getLocalizedValue(item.name_eng, item.name_heb) || '',
                 price: item.price || '',
                 category: item.category || '',
-                description: item.description || '',
+                description: getLocalizedValue(item.description_eng, item.description_heb) || '',
                 url: item.url || '',
-                allergens: Array.isArray(item.allergens) ? item.allergens.join(', ') : '',
+                allergens: Array.isArray(item.allergens) ? getLocalizedValue(item.allergens.map(allergen => allergen.eng).join(', '), item.allergens.map(allergen => allergen.heb).join(', ')) : '',
             });
         }
-    }, [item]);
+    }, [item, isRTL]);
+
 
     useEffect(() => {
         setSubmission(<span></span>);
@@ -52,26 +53,39 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         setSubmission(<span className="text-red-600"></span>);
 
 
+        let selectedAllergens = "";
+
+        if (formData.allergens !== "") {
+            selectedAllergens = formData.allergens.split(',').map(item => item.trim()).filter(item => item !== '');
+            for (let allergen of selectedAllergens) {
+                if (allergen.length > 30) {
+                    setSubmission(<span className="text-red-600">{allergen} {getLocalizedValue("is too long. Each should be 30 characters or fewer and separated by comma", "ארוך מדי כל הערה מופרדת בפסיק וקטנה מ30 תווים")}</span>);
+                    setLoading(false);
+                    return;
+                }
+            }
+        }
+
         if (!formData.name) {
-            setSubmission(<span className="text-red-600">Please enter a name</span>);
+            setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a name", "בבקשה הכנס שם")}</span>);
             setLoading(false);
             return;
         }
 
         if (!formData.price) {
-            setSubmission(<span className="text-red-600">Please enter a price</span>);
+            setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a price" , "בבקשה הכנס מחיר")}</span>);
             setLoading(false);
             return;
         }
 
         if (/[^0-9./\s]/.test(formData.price)) {
-            setSubmission(<span className="text-red-600">Please enter number for price</span>);
+            setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter number for price", "בבקשה הכנס מחיר כמספר")}</span>);
             setLoading(false);
             return;
         }
 
         if (!formData.category) {
-            setSubmission(<span className="text-red-600">Please enter a category</span>);
+            setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a category", "בבקשה הכנס קטגוריה")}</span>);
             setLoading(false);
             return;
         }
@@ -79,9 +93,6 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
 
         try {
-            const selectedAllergens = formData.allergens
-                ? formData.allergens.split(',').map(item => item.trim()).filter(Boolean)
-                : [];
 
             const response = await fetch('/api/updateItem', {
                 method: 'POST',
@@ -120,13 +131,13 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-[26rem]">
                 <DialogHeader>
-                    <DialogTitle>Edit item</DialogTitle>
+                    <DialogTitle>{getLocalizedValue("Edit item", "ערוך פריט")}</DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" dir={isRTL ? "rtl" : ""}>
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Item Name
+                            {getLocalizedValue("Item Name", "שם הפריט")}
                         </label>
                         <input
                             type="text"
@@ -141,7 +152,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Price
+                            {getLocalizedValue("Price", "מחיר")}
                         </label>
                         <input
                             type="text"
@@ -156,7 +167,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Category
+                            {getLocalizedValue("Category", "קטגוריה")}
                         </label>
                         <select
                             id="category"
@@ -166,10 +177,10 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                             onChange={handleInputChange}
                             className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
                         >
-                            <option value="">--Select a category--</option>
+                            <option value="">{getLocalizedValue("--Select a category--", "--בחר קטגוריה--")}</option>
                             {CATEGORIES.map((category) => (
                                 <option key={category.name} value={category.name}>
-                                    {category.name}
+                                    {getLocalizedValue(category.name_eng, category.name_heb)}
                                 </option>
                             ))}
                         </select>
@@ -178,7 +189,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Image URL
+                            {getLocalizedValue("Image URL" ,"קישור לתמונה")}
                         </label>
                         <input
                             type="url"
@@ -192,7 +203,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Description
+                            {getLocalizedValue("Description", "תיאור")}
                         </label>
                         <textarea
                             id="description"
@@ -206,7 +217,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="allergens" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Allergens (comma-separated)
+                           {getLocalizedValue(" Allergens, Additional comments (comma-separated)", "אלרגיות והערות נוספות (כל הערה מופרדת עם פסיק)")}
                         </label>
                         <input
                             type="text"
@@ -226,15 +237,15 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                            className="h-10 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                         >
-                            Cancel
+                            {getLocalizedValue("Cancel", "בטל")}
                         </button>
                         <button
                             type="submit"
-                            className={`w-24 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg ${loading ? 'bg-amber-200' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
+                            className={`h-10 w-24 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg ${loading ? 'bg-amber-200' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
                         >
-                            {loading ? 'Saving...' : 'Save'}
+                            {loading ? getLocalizedValue("Saving...", "...שומר") : getLocalizedValue("Save", "שמירה")}
                         </button>
                     </div>
                 </form>

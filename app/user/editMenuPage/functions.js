@@ -6,7 +6,7 @@ import CategoryDialog from "@/components/App/CategoryDialog";
 import DeleteCatDialog from "@/components/App/DeleteCatDialog";
 
 
-export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) {
+export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, getLocalizedValue, isRTL }) {
 
   const [selectedCategory, setSelectedCategory] = useState(category);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -79,8 +79,8 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
   return (
     <>
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white relative">
-        {category.name}
-        <span className="absolute right-0">
+        {getLocalizedValue(category.name_eng, category.name_heb)}
+        <span className={`${getLocalizedValue(`absolute right-0`, `absolute left-0`)}`}>
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger>
               <Ellipsis className="h-8 w-8" />
@@ -92,7 +92,7 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
               >
                 <div className="flex items-center space-x-2">
                   <Pencil className="h-4 w-4" />
-                  <span>Edit Category</span>
+                  <span>{getLocalizedValue("Edit Category", "ערוך קטגוריה")}</span>
                 </div>
               </DropdownMenuItem>
               {indexer > 0 && !loadingPosition && (
@@ -102,7 +102,7 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
                 >
                   <div className="flex items-center space-x-2">
                     <ArrowUp className="h-4 w-4" />
-                    <span>Move up</span>
+                    <span>{getLocalizedValue("Move up", "להזיז למעלה")}</span>
                   </div>
                 </DropdownMenuItem>
               )}
@@ -113,7 +113,7 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
                 >
                   <div className="flex items-center space-x-2">
                     <ArrowDown className="h-4 w-4" />
-                    <span>Move down</span>
+                    <span>{getLocalizedValue("Move down", "להזיז למטה")}</span>
                   </div>
                 </DropdownMenuItem>
               )}
@@ -123,7 +123,7 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
               >
                 <div className="flex items-center space-x-2">
                   <Trash2 className="h-4 w-4" />
-                  <span>Delete Category</span>
+                  <span>{getLocalizedValue("Delete Category", "מחק קטגוריה")}</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -138,6 +138,8 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         CATEGORIES={CATEGORIES}
+        getLocalizedValue={getLocalizedValue}
+        isRTL={isRTL}
       />
 
       <DeleteCatDialog
@@ -145,6 +147,8 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES }) 
         category={selectedCategory}
         isOpen={isDeleting}
         onClose={() => setIsDeleting(false)}
+        getLocalizedValue={getLocalizedValue}
+        isRTL={isRTL}
       />
 
 
@@ -164,14 +168,12 @@ export function SkeletonEditMenu() {
         <div className="pt-10"></div>
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => setIsItemVisible(!isItemVisible)}
-            className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
+            className={`cursor-not-allowed w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200`}
           >
             Add Item
           </button>
           <button
-            onClick={() => setIsCatVisible(!isCatVisible)}
-            className="w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200"
+            className={`cursor-not-allowed w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200`}
           >
             Add Category
           </button>

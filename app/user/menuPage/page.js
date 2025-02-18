@@ -49,7 +49,7 @@ const ThemeButton = ({ themeName, colors, isActive, onClick, setIsThemed }) => (
   />
 );
 
-export default function MenuPage() {
+export default function MenuPageClient() {
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
   
@@ -199,6 +199,7 @@ export default function MenuPage() {
   const textDirection = currentLang === 'heb' ? 'rtl' : 'ltr';
 
   return (
+    
       <div className="min-h-screen transition-all duration-500" dir={textDirection}>
         <ThemedBackground theme={currentTheme} />
         <div className="max-w-7xl mx-auto px-4 py-8">

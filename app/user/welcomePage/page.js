@@ -34,7 +34,8 @@ const translations = {
   }
 };
 
-export default function Welcome() {
+
+export default function WelcomePageClient() {
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
   
@@ -149,6 +150,7 @@ export default function Welcome() {
   }
 
   return (
+    
     <div className="max-w-4xl mx-auto" dir={currentLang === 'heb' ? 'rtl' : 'ltr'}>
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
         <div className="flex items-center justify-between">

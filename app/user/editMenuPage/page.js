@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 
 
 
-export default function editMenuPage() {
+export default function EditMenuPageClient() {
 
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
@@ -326,6 +326,7 @@ export default function editMenuPage() {
   }
 
   return (
+    
     <div className="max-w-4xl mx-auto" dir={isRTL ? "rtl" : ""}>
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{getLocalizedValue("Edit Menu", "ערוך תפריט")}</h1>
@@ -605,7 +606,7 @@ export default function editMenuPage() {
                             {item.url && (
                               <Image
                                 src={item.url}
-                                alt={item.name}
+                                alt={item.name_eng}
                                 width={150}
                                 height={150}
                                 className={`w-20 h-20 object-cover rounded-lg ${isRTL ? `order-last` : ``}`}

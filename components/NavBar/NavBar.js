@@ -13,7 +13,7 @@ export default function NavBar() {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <QrCode className="h-8 w-8 text-primary dark:text-primary-dark" />
-            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">MenuQR</span>
+            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">MenuCraftQR</span>
           </div>
           <div className="flex items-center space-x-4">
             <NavDarkButton />

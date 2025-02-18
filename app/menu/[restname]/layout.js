@@ -1,8 +1,23 @@
 import { Suspense } from 'react';
-import NavBarMenu from "@/components/NavBar/NavBarMenu";
+import dynamic from 'next/dynamic';
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTheme } from "@/server/dbMenu";
-import NavTopMenu from '@/components/NavBar/NavTopMenu';
+import { unstable_cache } from 'next/cache';
+
+const NavBarMenu = dynamic(() => import("@/components/NavBar/NavBarMenu"), {
+  loading: () => <div className="h-16" />
+});
+const NavTopMenu = dynamic(() => import('@/components/NavBar/NavTopMenu'), {
+  loading: () => <div className="h-16 bg-gray-100 dark:bg-gray-900" />
+});
+
+const getCachedTheme = unstable_cache(
+  async (restname) => {
+    return await getTheme(restname);
+  },
+  ['theme-data'],
+  { revalidate: 3600 } 
+);
 
 const LoadingSkeleton = () => {
     const skeletonItems = Array.from({ length: 4 });
@@ -41,7 +56,7 @@ const LoadingSkeleton = () => {
 
 export default async function RestaurantLayout({ params, children }) {
     const restname = (await params)?.restname;
-    const theme = await getTheme(restname);
+    const theme = await getCachedTheme(restname);
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -60,4 +75,3 @@ export default async function RestaurantLayout({ params, children }) {
         </div>
     );
 };
-

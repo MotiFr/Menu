@@ -2,6 +2,15 @@ import MenuCard from "@/components/Menu/MenuCard";
 import ThemedBackground from "@/components/Menu/ThemeBG";
 import { getRestaurantsNames, getRestInfo } from "@/server/dbMenu";
 import { categoryClasses } from '@/components/Menu/Themes';
+import { unstable_cache } from 'next/cache';
+
+const getCachedRestInfo = unstable_cache(
+  async (restname) => {
+    return await getRestInfo(restname);
+  },
+  ['rest-info'],
+  { revalidate: 3600 } 
+);
 
 export async function generateStaticParams() {
   const restnames = await getRestaurantsNames();
@@ -18,6 +27,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
+export const revalidate = 3600; 
+
 export default async function Menu({ params, searchParams }) {
   const restname = (await params).restname;
   const lang = (await searchParams).lang || 'heb';
@@ -26,7 +37,7 @@ export default async function Menu({ params, searchParams }) {
   const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
 
   try {
-    const { categories: CATEGORIES, theme, header, description, items } = await getRestInfo(restname);
+    const { categories: CATEGORIES, theme, header, description, items } = await getCachedRestInfo(restname);
     const menu = items.map(item => ({ ...item, _id: item._id.toString() }));
 
     return (

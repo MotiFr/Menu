@@ -1,124 +1,173 @@
 export const themes = {
     forest: {
-        primary: '#566246',
-        secondary: '#A4C2A5',
-        accent: '#D8DAD3',
-        background: '#F1F2EB',
-        darkBackground: '#1A1C16',
+        primary: '#4A5940',        // Slightly darker for better contrast
+        secondary: '#8EB48F',      // Slightly muted for harmony
+        accent: '#D8DAD3',         // Kept the same
+        background: '#F7F8F2',     // Lighter for better light mode
+        darkBackground: '#1A1C16', // Kept the same
         pattern: 'radial-gradient(circle at 50% 50%, #A4C2A5 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #566246 0%, transparent 60%)',
     },
     sea: {
-        primary: '#141B41',
-        secondary: '#306BAC',
-        accent: '#6F9CEB',
-        background: '#98B9F2',
-        darkBackground: '#0A0D21',
+        primary: '#0F1A4D',        // Deeper blue for better contrast
+        secondary: '#3878C4',      // Brighter for better visibility
+        accent: '#7BA6F0',         // Slightly adjusted for harmony
+        background: '#E8F0FF',     // Much lighter for better light mode
+        darkBackground: '#0A0D21', // Kept the same
         pattern: 'radial-gradient(circle at 50% 50%, #6F9CEB 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #141B41 0%, transparent 60%)',
     },
     dust: {
-        primary: '#463F3A',
-        secondary: '#8A817C',
-        accent: '#BCB8B1',
-        background: '#F4F3EE',
-        darkBackground: '#161412',
+        primary: '#403A35',        // Slightly darker
+        secondary: '#8A817C',      // Kept the same
+        accent: '#BCB8B1',         // Kept the same
+        background: '#F9F8F5',     // Lighter for better light mode
+        darkBackground: '#161412', // Kept the same
         pattern: 'radial-gradient(circle at 50% 50%, #BCB8B1 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #463F3A 0%, transparent 60%)',
     },
     violet: {
-        primary: '#9221CE',
-        secondary: '#CC2383',
-        accent: '#B5A7B5',
-        background: '#F5E6FA',  
-        darkBackground: '#14010F',
+        primary: '#7A1CAF',        // Slightly muted for better harmony
+        secondary: '#B12075',      // Slightly muted for better harmony
+        accent: '#C9BDC9',         // Lightened for better visibility
+        background: '#FAF0FD',     // Lighter for better light mode  
+        darkBackground: '#14010F', // Kept the same
         pattern: 'radial-gradient(circle at 50% 50%, #CC2383 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #9221CE 0%, transparent 60%)',
     },
     darkWood: {
-        primary: '#202030',
-        secondary: '#39304A',
-        accent: '#635C51',
-        background: '#7D7461',
-        darkBackground: '#0F0F18',
+        primary: '#202030',        // Kept the same
+        secondary: '#39304A',      // Kept the same
+        accent: '#756C5F',         // Brightened a bit for better visibility
+        background: '#EAE5DB',     // Much lighter for light mode
+        darkBackground: '#0F0F18', // Kept the same
         pattern: 'radial-gradient(circle at 50% 50%, #635C51 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #202030 0%, transparent 60%)',
     },
     sky: {
-        primary: '#174769',
-        secondary: '#294C60',
-        accent: '#8FB8ED',
-        background: '#62BFED',
-        darkBackground: '#0B2335',
+        primary: '#174769',        // Kept the same
+        secondary: '#2B5778',      // Slightly darkened for better contrast
+        accent: '#8FB8ED',         // Kept the same
+        background: '#E6F4FF',     // Much lighter for better light mode
+        darkBackground: '#0B2335', // Kept the same
         pattern: 'radial-gradient(circle at 50% 50%, #8FB8ED 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #174769 0%, transparent 60%)',
     },
+    // New theme: Terracotta - warm, earthy tones inspired by pottery and desert landscapes
+    terracotta: {
+        primary: '#993D20',        // Rich terracotta
+        secondary: '#D2691E',      // Lighter terracotta/clay
+        accent: '#E6C9A8',         // Soft sand color
+        background: '#FFF8EC',     // Very light sand/cream
+        darkBackground: '#241811', // Deep brown
+        pattern: 'radial-gradient(circle at 50% 50%, #D2691E 0%, transparent 60%)',
+        darkPattern: 'radial-gradient(circle at 50% 50%, #993D20 0%, transparent 60%)',
+    },
+    // New theme: Mint - fresh, cool mint tones with complementary accents
+    mint: {
+        primary: '#0E8A6E',        // Deep mint green
+        secondary: '#52B788',      // Medium mint
+        accent: '#B7E4C7',         // Light mint
+        background: '#F0FFF4',     // Barely mint tinted white
+        darkBackground: '#0A2E21', // Dark green
+        pattern: 'radial-gradient(circle at 50% 50%, #52B788 0%, transparent 60%)',
+        darkPattern: 'radial-gradient(circle at 50% 50%, #0E8A6E 0%, transparent 60%)',
+    },
+    // New theme: Berry - rich berry tones inspired by blackberries and blueberries
+    berry: {
+        primary: '#4A1942',        // Deep berry purple
+        secondary: '#7B2869',      // Medium berry
+        accent: '#C85C8E',         // Lighter berry
+        background: '#FCF2F6',     // Very light pink
+        darkBackground: '#25091F', // Very dark purple
+        pattern: 'radial-gradient(circle at 50% 50%, #7B2869 0%, transparent 60%)',
+        darkPattern: 'radial-gradient(circle at 50% 50%, #4A1942 0%, transparent 60%)',
+    },
     default: {
-        primary: '#B3793C',
-        secondary: '#617073',
-        accent: '#000000',
-        background: '#FFFFFF',
-        darkBackground: '#000000',
+        primary: '#A36B2C',        // Slightly darker
+        secondary: '#566266',      // Slightly muted
+        accent: '#333333',         // Changed from pure black for better harmony
+        background: '#FFFFFF',     // Kept the same
+        darkBackground: '#0F1214', // Changed from pure black
         pattern: 'radial-gradient(circle at 50% 50%, #B3793C 0%, transparent 60%)',
         darkPattern: 'radial-gradient(circle at 50% 50%, #617073 0%, transparent 60%)',
     }
 };
+
 export const categoryClasses = {
-    forest: 'bg-[#566246]/10 dark:bg-[#566246]/20 border-[#566246]/20 dark:border-[#A4C2A5]/20',
-    sea: 'bg-[#141B41]/10 dark:bg-[#141B41]/20 border-[#141B41]/20 dark:border-[#6F9CEB]/20',
-    dust: 'bg-[#463F3A]/10 dark:bg-[#463F3A]/20 border-[#463F3A]/20 dark:border-[#BCB8B1]/20',
-    violet: 'bg-[#9221CE]/10 dark:bg-[#9221CE]/20 border-[#9221CE]/20 dark:border-[#CC2383]/20',
-    darkWood: 'bg-[#202030]/10 dark:bg-[#202030]/20 border-[#202030]/20 dark:border-[#635C51]/20',
+    forest: 'bg-[#4A5940]/10 dark:bg-[#4A5940]/20 border-[#4A5940]/20 dark:border-[#8EB48F]/20',
+    sea: 'bg-[#0F1A4D]/10 dark:bg-[#0F1A4D]/20 border-[#0F1A4D]/20 dark:border-[#7BA6F0]/20',
+    dust: 'bg-[#403A35]/10 dark:bg-[#403A35]/20 border-[#403A35]/20 dark:border-[#BCB8B1]/20',
+    violet: 'bg-[#7A1CAF]/10 dark:bg-[#7A1CAF]/20 border-[#7A1CAF]/20 dark:border-[#B12075]/20',
+    darkWood: 'bg-[#202030]/10 dark:bg-[#202030]/20 border-[#202030]/20 dark:border-[#756C5F]/20',
     sky: 'bg-[#174769]/10 dark:bg-[#174769]/20 border-[#174769]/20 dark:border-[#8FB8ED]/20',
-    default: 'bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+    terracotta: 'bg-[#993D20]/10 dark:bg-[#993D20]/20 border-[#993D20]/20 dark:border-[#E6C9A8]/20',
+    mint: 'bg-[#0E8A6E]/10 dark:bg-[#0E8A6E]/20 border-[#0E8A6E]/20 dark:border-[#B7E4C7]/20',
+    berry: 'bg-[#4A1942]/10 dark:bg-[#4A1942]/20 border-[#4A1942]/20 dark:border-[#C85C8E]/20',
+    default: 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
 };
 
 export const menuItemClasses = {
-    forest: 'bg-[#A4C2A5]/20 hover:bg-[#A4C2A5]/30 dark:bg-[#566246]/30 dark:hover:bg-[#566246]/40',
-    sea: 'bg-[#306BAC]/20 hover:bg-[#306BAC]/30 dark:bg-[#141B41]/30 dark:hover:bg-[#141B41]/40',
-    dust: 'bg-[#8A817C]/20 hover:bg-[#8A817C]/30 dark:bg-[#463F3A]/30 dark:hover:bg-[#463F3A]/40',
-    violet: 'bg-[#CC2383]/20 hover:bg-[#CC2383]/30 dark:bg-[#9221CE]/30 dark:hover:bg-[#9221CE]/40',
+    forest: 'bg-[#8EB48F]/20 hover:bg-[#8EB48F]/30 dark:bg-[#4A5940]/30 dark:hover:bg-[#4A5940]/40',
+    sea: 'bg-[#3878C4]/20 hover:bg-[#3878C4]/30 dark:bg-[#0F1A4D]/30 dark:hover:bg-[#0F1A4D]/40',
+    dust: 'bg-[#8A817C]/20 hover:bg-[#8A817C]/30 dark:bg-[#403A35]/30 dark:hover:bg-[#403A35]/40',
+    violet: 'bg-[#B12075]/20 hover:bg-[#B12075]/30 dark:bg-[#7A1CAF]/30 dark:hover:bg-[#7A1CAF]/40',
     darkWood: 'bg-[#39304A]/20 hover:bg-[#39304A]/30 dark:bg-[#202030]/30 dark:hover:bg-[#202030]/40',
-    sky: 'bg-[#294C60]/20 hover:bg-[#294C60]/30 dark:bg-[#174769]/30 dark:hover:bg-[#174769]/40',
+    sky: 'bg-[#2B5778]/20 hover:bg-[#2B5778]/30 dark:bg-[#174769]/30 dark:hover:bg-[#174769]/40',
+    terracotta: 'bg-[#D2691E]/20 hover:bg-[#D2691E]/30 dark:bg-[#993D20]/30 dark:hover:bg-[#993D20]/40',
+    mint: 'bg-[#52B788]/20 hover:bg-[#52B788]/30 dark:bg-[#0E8A6E]/30 dark:hover:bg-[#0E8A6E]/40',
+    berry: 'bg-[#7B2869]/20 hover:bg-[#7B2869]/30 dark:bg-[#4A1942]/30 dark:hover:bg-[#4A1942]/40',
     default: 'bg-white/80 hover:bg-gray-50 dark:bg-gray-900/80 dark:hover:bg-gray-800/80'
 };
+
 export const dialogClasses = {
-    forest: 'border-[#566246] dark:border-[#A4C2A5] bg-[#F1F2EB] dark:bg-[#1A1C16]',
-    sea: 'border-[#141B41] dark:border-[#6F9CEB] bg-[#98B9F2] dark:bg-[#0A0D21]',
-    dust: 'border-[#463F3A] dark:border-[#BCB8B1] bg-[#F4F3EE] dark:bg-[#161412]',
-    violet: 'border-[#9221CE] dark:border-[#CC2383] bg-[#F5E6FA] dark:bg-[#14010F]',
-    darkWood: 'border-[#202030] dark:border-[#635C51] bg-[#7D7461] dark:bg-[#0F0F18]',
-    sky: 'border-[#174769] dark:border-[#8FB8ED] bg-[#62BFED] dark:bg-[#0B2335]',
+    forest: 'border-[#4A5940] dark:border-[#8EB48F] bg-[#F7F8F2] dark:bg-[#1A1C16]',
+    sea: 'border-[#0F1A4D] dark:border-[#7BA6F0] bg-[#E8F0FF] dark:bg-[#0A0D21]',
+    dust: 'border-[#403A35] dark:border-[#BCB8B1] bg-[#F9F8F5] dark:bg-[#161412]',
+    violet: 'border-[#7A1CAF] dark:border-[#B12075] bg-[#FAF0FD] dark:bg-[#14010F]',
+    darkWood: 'border-[#202030] dark:border-[#756C5F] bg-[#EAE5DB] dark:bg-[#0F0F18]',
+    sky: 'border-[#174769] dark:border-[#8FB8ED] bg-[#E6F4FF] dark:bg-[#0B2335]',
+    terracotta: 'border-[#993D20] dark:border-[#E6C9A8] bg-[#FFF8EC] dark:bg-[#241811]',
+    mint: 'border-[#0E8A6E] dark:border-[#B7E4C7] bg-[#F0FFF4] dark:bg-[#0A2E21]',
+    berry: 'border-[#4A1942] dark:border-[#C85C8E] bg-[#FCF2F6] dark:bg-[#25091F]',
     default: 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'
 };
 
 export const buttonClasses = {
-    forest: 'bg-[#566246] hover:bg-[#566246]/90 dark:bg-[#A4C2A5] dark:hover:bg-[#A4C2A5]/90',
-    sea: 'bg-[#141B41] hover:bg-[#141B41]/90 dark:bg-[#306BAC] dark:hover:bg-[#306BAC]/90',
-    dust: 'bg-[#463F3A] hover:bg-[#463F3A]/90 dark:bg-[#8A817C] dark:hover:bg-[#8A817C]/90',
-    violet: 'bg-[#9221CE] hover:bg-[#9221CE]/90 dark:bg-[#CC2383] dark:hover:bg-[#CC2383]/90',
+    forest: 'bg-[#4A5940] hover:bg-[#4A5940]/90 dark:bg-[#8EB48F] dark:hover:bg-[#8EB48F]/90',
+    sea: 'bg-[#0F1A4D] hover:bg-[#0F1A4D]/90 dark:bg-[#3878C4] dark:hover:bg-[#3878C4]/90',
+    dust: 'bg-[#403A35] hover:bg-[#403A35]/90 dark:bg-[#8A817C] dark:hover:bg-[#8A817C]/90',
+    violet: 'bg-[#7A1CAF] hover:bg-[#7A1CAF]/90 dark:bg-[#B12075] dark:hover:bg-[#B12075]/90',
     darkWood: 'bg-[#202030] hover:bg-[#202030]/90 dark:bg-[#39304A] dark:hover:bg-[#39304A]/90',
-    sky: 'bg-[#174769] hover:bg-[#174769]/90 dark:bg-[#294C60] dark:hover:bg-[#294C60]/90',
-    default: 'bg-[#B3793C] hover:bg-[#B3793C]/90 dark:bg-[#617073] dark:hover:bg-[#617073]/90'
+    sky: 'bg-[#174769] hover:bg-[#174769]/90 dark:bg-[#2B5778] dark:hover:bg-[#2B5778]/90',
+    terracotta: 'bg-[#993D20] hover:bg-[#993D20]/90 dark:bg-[#D2691E] dark:hover:bg-[#D2691E]/90',
+    mint: 'bg-[#0E8A6E] hover:bg-[#0E8A6E]/90 dark:bg-[#52B788] dark:hover:bg-[#52B788]/90',
+    berry: 'bg-[#4A1942] hover:bg-[#4A1942]/90 dark:bg-[#7B2869] dark:hover:bg-[#7B2869]/90',
+    default: 'bg-[#A36B2C] hover:bg-[#A36B2C]/90 dark:bg-[#566266] dark:hover:bg-[#566266]/90'
 };
 
 export const priceClasses = {
-    forest: 'text-[#566246] dark:text-[#A4C2A5]',
-    sea: 'text-[#141B41] dark:text-[#6F9CEB]',
-    dust: 'text-[#463F3A] dark:text-[#BCB8B1]',
-    violet: 'text-[#CC2383] dark:text-[#9221CE]',
-    darkWood: 'text-[#202030] dark:text-[#635C51]',
+    forest: 'text-[#4A5940] dark:text-[#8EB48F]',
+    sea: 'text-[#0F1A4D] dark:text-[#7BA6F0]',
+    dust: 'text-[#403A35] dark:text-[#BCB8B1]',
+    violet: 'text-[#B12075] dark:text-[#7A1CAF]',
+    darkWood: 'text-[#202030] dark:text-[#756C5F]',
     sky: 'text-[#174769] dark:text-[#8FB8ED]',
+    terracotta: 'text-[#993D20] dark:text-[#E6C9A8]',
+    mint: 'text-[#0E8A6E] dark:text-[#B7E4C7]',
+    berry: 'text-[#4A1942] dark:text-[#C85C8E]',
     default: 'text-gray-900 dark:text-gray-100'
 };
 
 export const botNav = {
-    forest: 'border-[#566246] dark:border-[#5E7150] bg-[#C0C3B8] dark:bg-[#10130D]',
-    sea: 'border-[#141B41] dark:border-[#2C416F] bg-[#4D69A3] dark:bg-[#050713]',
-    dust: 'border-[#463F3A] dark:border-[#6B645E] bg-[#8B837C] dark:bg-[#0A0807]',
-    violet: 'border-[#9221CE] dark:border-[#B34077] bg-[#83668A] dark:bg-[#080007]',
-    darkWood: 'border-[#202030] dark:border-[#383040] bg-[#514C48] dark:bg-[#050507]',
-    sky: 'border-[#174769] dark:border-[#3B6A93] bg-[#617FA6] dark:bg-[#03081A]',
-    default: 'border-gray-500 dark:border-gray-600 bg-[#828282] dark:bg-gray-800'
+    forest: 'border-[#4A5940] dark:border-[#526148] bg-[#E3E5DC] dark:bg-[#10130D]',
+    sea: 'border-[#0F1A4D] dark:border-[#233B66] bg-[#D1DFFA] dark:bg-[#050713]',
+    dust: 'border-[#403A35] dark:border-[#5E5752] bg-[#E5E2DE] dark:bg-[#0A0807]',
+    violet: 'border-[#7A1CAF] dark:border-[#9A2D6E] bg-[#E9DAEA] dark:bg-[#080007]',
+    darkWood: 'border-[#202030] dark:border-[#383040] bg-[#CFC8C0] dark:bg-[#050507]',
+    sky: 'border-[#174769] dark:border-[#2F5F87] bg-[#D4E4F7] dark:bg-[#03081A]',
+    terracotta: 'border-[#993D20] dark:border-[#AC5732] bg-[#F7E8D8] dark:bg-[#150D09]',
+    mint: 'border-[#0E8A6E] dark:border-[#1A9E80] bg-[#E0F5EB] dark:bg-[#051A14]',
+    berry: 'border-[#4A1942] dark:border-[#5F2156] bg-[#F5E1EB] dark:bg-[#150610]',
+    default: 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800'
 };
-

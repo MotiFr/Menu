@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Eye, EyeOff, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -105,7 +106,7 @@ export default function SignIn() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm font-medium">
-                  Username
+                  Username / Email
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -152,6 +153,16 @@ export default function SignIn() {
                   </Button>
                 </div>
               </div>
+              
+              <div className="text-right">
+                <Link
+                  href="/reset-password"
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              
               <div>
                 {error && (
                   <p className="text-red-500 text-sm font-medium">{error}</p>

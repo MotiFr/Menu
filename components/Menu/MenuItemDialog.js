@@ -40,7 +40,9 @@ export default function MenuItemDialog({ theme = 'default', item, isOpen, onClos
               fill
               sizes="(max-width: 600px) 80vw, (max-width: 1200px) 40vw, 25vw"
               className="rounded-lg object-cover"
-              priority
+              onError={(e) => {
+                e.target.closest('.relative').style.display = 'none';
+              }}
             />
           </div>
         )}

@@ -1,15 +1,18 @@
+"use server"
 import MenuCard from "@/components/Menu/MenuCard";
 import ThemedBackground from "@/components/Menu/ThemeBG";
 import { getRestaurantsNames, getRestInfo } from "@/server/dbMenu";
 import { categoryClasses } from '@/components/Menu/Themes';
 import { unstable_cache } from 'next/cache';
+import MenuFooter from "@/components/Menu/FooterView";
+import ViewTracker from "@/components/Menu/ViewTracker";
 
 const getCachedRestInfo = unstable_cache(
   async (restname) => {
     return await getRestInfo(restname);
   },
   ['rest-info'],
-  { revalidate: 3600 } 
+  { revalidate: 3600 }
 );
 
 export async function generateStaticParams() {
@@ -27,19 +30,15 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export const revalidate = 3600; 
-
 export default async function Menu({ params, searchParams }) {
   const restname = (await params).restname;
   const lang = (await searchParams).lang || 'heb';
   const isRTL = lang === 'heb';
 
   const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
-
   try {
-    const { categories: CATEGORIES, theme, header, description, items } = await getCachedRestInfo(restname);
+    const { categories: CATEGORIES, theme, header, description, items, footerText, socialLinks } = await getCachedRestInfo(restname);
     const menu = items.map(item => ({ ...item, _id: item._id.toString() }));
-
     return (
       <div className="min-h-screen transition-all duration-500" dir={isRTL ? 'rtl' : 'ltr'}>
         <ThemedBackground theme={theme} />
@@ -85,6 +84,14 @@ export default async function Menu({ params, searchParams }) {
             })}
           </div>
         </div>
+        <ViewTracker
+          restname={restname}
+        />
+        <MenuFooter
+          currentLang={isRTL ? 'heb' : 'eng'}
+          currentTheme={theme}
+          Footer={{ footerText, socialLinks }}
+        />
       </div>
     );
   } catch (error) {

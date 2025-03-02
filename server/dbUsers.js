@@ -2,7 +2,11 @@
 import { hashPassword, verifyPassword } from "@/components/DB/Hash";
 import { createAuthSession } from "@/lib/auth";
 import { getMongoClient } from "./dbRest";
+import { Resend } from "resend";
+import EmailContent from "@/components/Mail/EmailContent";
 
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function getUserNEmail() {
     try {
@@ -48,38 +52,52 @@ export async function signUp(username, password, email, restaurantName, phone, l
         await createAuthSession(updatedUser._id);
         await createDummyItems(username);
         await createDummyCategories(username, restaurantName);
+        await resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL,
+            to: email,
+            subject: 'MenuCraft',
+            react: <EmailContent />,
+        });
         return response;
     } catch (error) {
         console.error('Error storing new user:', error);
+        console.log('Error storing new user:', error)
         throw error;
     }
 }
 
 
-export async function signIn(username, password) {
+export async function signIn(usernameOrEmail, password) {
     try {
         const client = await getMongoClient();
         const db = client.db("data");
+        
         const user = await db.collection("users").findOne(
             {
-                username: username,
+                $or: [
+                    { username: usernameOrEmail },
+                    { email: usernameOrEmail }
+                ]
             }
         );
+        
         if (!user) {
             return null;
         }
+        
         const isValid = await verifyPassword(password, user.password);
-        await createAuthSession(user._id);
+        
         if (isValid) {
+            await createAuthSession(user._id);
             return user;
         }
-        return isValid;
+        
+        return false;
     } catch (error) {
-        console.error('Error storing new user:', error);
+        console.error('Error during sign in:', error);
         throw error;
     }
 }
-
 
 async function createDummyItems(username) {
     try {
@@ -88,7 +106,6 @@ async function createDummyItems(username) {
         await Promise.all(menuItems.map(item =>
             db.collection(username).insertOne(item)
         ));
-        console.log("Successfully inserted all dummy food items");
     } catch (error) {
         console.error("Error inserting dummy items:", error);
     }
@@ -114,7 +131,6 @@ async function createDummyCategories(username) {
             }
         ]);
 
-        console.log("Successfully inserted menu categories");
     } catch (error) {
         console.error("Error inserting categories:", error);
     }

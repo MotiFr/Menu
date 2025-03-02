@@ -1,5 +1,5 @@
 import { verifyAuthSession } from "@/lib/auth";
-import { getRestDetails } from "@/server/dbRest";
+import { getRestStatics } from "@/server/dbRest";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -10,8 +10,8 @@ export async function GET() {
     }
     
     try {
-        const restname = await getRestDetails();
-        return NextResponse.json({ restname });
+        const {restname, catCount, itemCount, views} = await getRestStatics();
+        return NextResponse.json({restname, catCount, itemCount, views});
     } catch (error) {
         return NextResponse.json(
             { message: "Failed to fetch items", error: error.message },

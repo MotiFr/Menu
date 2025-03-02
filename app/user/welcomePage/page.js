@@ -4,6 +4,7 @@ import { useQRCode } from "next-qrcode";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import SettingsDialog from "@/components/App/AdditionalSet";
 
 const translations = {
   eng: {
@@ -17,7 +18,10 @@ const translations = {
     categories: "Categories",
     lastUpdated: "Last Updated",
     logout: "Logout",
-    active: "Active"
+    active: "Active",
+    contact: "Additional settings / contact support",
+    additional1: "Want some more settings like: background image, special URL, QR with logo and more",
+    additional2: "Contact us"
   },
   heb: {
     welcome: "ברוך שובך",
@@ -30,7 +34,10 @@ const translations = {
     categories: "קטגוריות",
     lastUpdated: "עודכן לאחרונה",
     logout: "התנתק",
-    active: "פעיל"
+    active: "פעיל",
+    contact: "הגדרות נוספות / יצירת קשר",
+    additional1: "רוצה הגדרות נוספות כמו: תמונת רקע מיוחדת, קישור URL מיוחד, קוד QR עם סמל המסעדה ועוד",
+    additional2: "צור קשר",
   }
 };
 
@@ -56,6 +63,10 @@ export default function WelcomePageClient() {
   const [loading, setLoading] = useState(true);
   const [fullUrl, setFullUrl] = useState('');
   const [restName, setRestName] = useState("");
+  const [views, setViews] = useState("");
+  const [catCount, setCatCount] = useState("");
+  const [itemCount, setitemCount] = useState("");
+
   const t = translations[currentLang];
   const qrRef = useRef(null);
 
@@ -97,8 +108,12 @@ export default function WelcomePageClient() {
           redirect();
         }
         setRestName(json.restname);
+        setCatCount(json.catCount);
+        setViews(json.views);
+        setitemCount(json.itemCount);
         const currentUrl = window.location.href;
-        setFullUrl(currentUrl.replace(/\/user\/welcomePage$/, `/menu/${json.restname}`));
+        const cleanUrl = currentUrl.replace(/(\?lang=[^&]*&?)|(&?lang=[^&]*&?)/g, '');
+        setFullUrl(cleanUrl.replace(/\/user\/welcomePage$/, `/menu/${json.restname}`));
       } catch (err) {
         console.error('Error fetching data:', err);
       } finally {
@@ -121,7 +136,7 @@ export default function WelcomePageClient() {
             <Skeleton className="h-6 w-20 rounded-full" />
           </div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mt-8 grid grid-cols-1 gap-6">
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
               <Skeleton className="h-6 w-48 mb-4" />
               <div className="aspect-square w-48 mx-auto">
@@ -169,10 +184,10 @@ export default function WelcomePageClient() {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="mt-8 grid grid-cols-1 gap-6">
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-              <QrCode className="h-5 w-5 mr-2 text-primary dark:text-primary-dark" />
+              <QrCode className="h-5 w-5 mr-2 ml-2 text-primary dark:text-primary-dark" />
               {t.menuQrCode}
             </h2>
             <div ref={qrRef} className="mt-4 aspect-square w-48 mx-auto bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
@@ -201,26 +216,29 @@ export default function WelcomePageClient() {
             <dl className="mt-4 grid grid-cols-2 gap-4">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.menuViews}</dt>
-                <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">1,234</dd>
+                <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">{views ? views : "0"}</dd>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.menuItems}</dt>
-                <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">24</dd>
+                <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">{itemCount}</dd>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.categories}</dt>
-                <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">4</dd>
+                <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">{catCount}</dd>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.lastUpdated}</dt>
-                <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">2 days ago</dd>
-              </div>
+              
             </dl>
           </div>
         </div>
 
         <div className="mt-8">
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4">
+            <SettingsDialog 
+            currentLang={currentLang}
+            t={t}
+            />
+          </div>
+          <div className="mt-4 grid grid-cols-1 gap-4">
             <button
               className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/10 hover:bg-primary/20 dark:hover:bg-primary-dark/20"
               onClick={logout}

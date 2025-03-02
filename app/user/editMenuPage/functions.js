@@ -157,48 +157,77 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, ge
   )
 }
 
-export function SkeletonEditMenu() {
-  return (<>
-    <div className="max-w-4xl mx-auto">
+export function SkeletonEditMenu({ isRTL }) {
+  return (
+    <div className="max-w-4xl mx-auto" dir={isRTL ? "rtl" : ""}>
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Menu</h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
-          Here you can see all your items and categories, edit and remove them.
-        </p>
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-8 w-64 mb-4" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+        </div>
+        
         <div className="pt-10"></div>
+        
+        {/* Action buttons skeletons */}
         <div className="max-w-4xl mx-auto">
-          <button
-            className={`cursor-not-allowed w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200`}
-          >
-            Add Item
-          </button>
-          <button
-            className={`cursor-not-allowed w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200`}
-          >
-            Add Category
-          </button>
+          <Skeleton className="w-full mb-4 h-12 rounded-lg" />
+          <Skeleton className="w-full mb-4 h-12 rounded-lg" />
+          
+          {/* Categories and items skeletons */}
+          <div className="mt-8 space-y-8">
+            {/* Repeat for 2 categories */}
+            {[1, 2].map((category) => (
+              <div key={category} className="mb-6">
+                {/* Category header skeleton */}
+                <div className="flex justify-between items-center mb-4">
+                  <Skeleton className="h-6 w-1/4" />
+                  <Skeleton className="h-6 w-8" />
+                </div>
+                
+                {/* Category description skeleton */}
+                <Skeleton className="h-4 w-2/3 mb-4" />
+                
+                {/* Items skeletons - 3 items per category */}
+                <div className="grid grid-cols-1 gap-4">
+                  {[1, 2, 3].map((item) => (
+                    <div 
+                      key={item}
+                      className="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4"
+                    >
+                      <div className="flex items-start space-x-4 pl-6 pr-12">
+                        {/* Item image skeleton */}
+                        <div className={`${isRTL ? "order-last" : ""}`}>
+                          <Skeleton className="w-20 h-20 rounded-lg" />
+                        </div>
+                        
+                        <div className="flex-1">
+                          {/* Item name skeleton */}
+                          <Skeleton className="h-5 w-1/2 mb-2" />
+                          
+                          {/* Item description skeleton */}
+                          <Skeleton className="h-4 w-3/4" />
+                          
+                          {/* Item price skeleton */}
+                          <div className={`absolute ${
+                            isRTL ? "left-32 bottom-2" : "right-12 bottom-2"
+                          }`}>
+                            <Skeleton className="h-4 w-16" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
-    <div className="p-10 flex items-start space-x-4">
-      <Skeleton className="w-20 h-20 rounded-lg" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-5 w-16 mt-2" />
-      </div>
-    </div>
-    <div className="p-10 flex items-start space-x-4">
-      <Skeleton className="w-20 h-20 rounded-lg" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-5 w-16 mt-2" />
-      </div>
-    </div>
-  </>)
+  );
 }
 
 export async function handleUp(item, items, setLoadingPosition, setRefresh) {

@@ -10,10 +10,11 @@ export async function GET() {
     }
     
     try {
-        const { theme, items, header, description } = await getItemsThemeText();
+        const { theme, items, header, description, footer } = await getItemsThemeText();
         const categoriesOb = await getCategories();
         const categories = categoriesOb.categories;
-        return NextResponse.json({ theme, items, header, description, categories });
+        const {footerText, socialLinks} = footer
+        return NextResponse.json({ theme, items, header, description, categories, footerText, socialLinks });
     } catch (error) {
         return NextResponse.json(
             { message: "Failed to fetch items", error: error.message },

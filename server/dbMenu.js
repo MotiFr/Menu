@@ -9,13 +9,56 @@ export async function changeMenu(theme, header, description) {
         const client = await getMongoClient();
         const db = client.db("restaurant");
 
-        const res = await db.collection(`${restname} Data`).updateOne(
+        await db.collection(`${restname} Data`).updateOne(
             {},
             {
                 $set: {
                     theme: theme,
                     header: header,
                     description: description
+                }
+            }
+        );
+
+        revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
+
+    } catch (error) {
+        console.error('Error storing new item:', error);
+        throw error;
+    }
+}
+
+
+export async function updateViewCount(restname) {
+    try {
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+        await db.collection(`${restname} Data`).updateOne(
+            { },
+            { $inc: { views: 1 } }
+        );
+
+        return true;
+    } catch (error) {
+        console.error('Error updating view count:', error);
+        throw error;
+    }
+}
+
+
+export async function changeFooter(footerText, socialLinks) {
+    try {
+        const restname = await getRestaurant();
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+
+        await db.collection(`${restname} Data`).updateOne(
+            {},
+            {
+                $set: {
+                    footerText,
+                    socialLinks,
                 }
             }
         );
@@ -54,12 +97,15 @@ export async function getRestInfo(restname) {
             .findOne(
                 { theme: { $exists: true } },
             );
+
         const categories = categoriesOb ? categoriesOb.categories : [];
         const theme = details.theme
         const header = details.header
         const description = details.description
+        const footerText = details.footerText
+        const socialLinks = details.socialLinks
 
-        return { items, categories, theme, header, description };
+        return { items, categories, theme, header, description, footerText, socialLinks };
     } catch (error) {
         console.error('Error getting restaurant info:', error);
         throw new Error('Failed to fetch restaurant information');

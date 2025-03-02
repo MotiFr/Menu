@@ -33,7 +33,7 @@ export default function MenuCard({ items, theme = 'default', isRTL = false }) {
                     className="rounded-lg object-cover"
                     sizes="100px"
                     onError={(e) => {
-                      e.target.style.display = 'none';
+                      e.target.closest('.flex-shrink-0').style.display = 'none';
                     }}
                   />
 

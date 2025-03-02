@@ -26,7 +26,7 @@ export default function MenuItemDialog({ theme = 'default', item, isOpen, onClos
                     <div className="mt-4 relative h-48 w-full">
                         <Image
                             src={item.url}
-                            alt={item.name}
+                            alt={item.name_eng}
                             fill
                             className="rounded-lg object-cover"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

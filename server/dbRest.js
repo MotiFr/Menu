@@ -56,45 +56,45 @@ export async function getMongoClient() {
 
 export async function translateText(text, sourceLang, targetLang) {
     if (!text) return '';
-    
-    const from = sourceLang === 'eng' ? 'en' : 'iw'; 
+
+    const from = sourceLang === 'eng' ? 'en' : 'iw';
     const to = targetLang === 'eng' ? 'en' : 'iw';
-  
+
     try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0',
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      
-      if (data && data[0]) {
-        return data[0]
-          .map(segment => segment[0])
-          .filter(Boolean)
-          .join(' ');
-      }
-  
-      throw new Error('No translation data received');
+
+        const data = await response.json();
+
+        if (data && data[0]) {
+            return data[0]
+                .map(segment => segment[0])
+                .filter(Boolean)
+                .join(' ');
+        }
+
+        throw new Error('No translation data received');
     } catch (error) {
-      console.error('Translation error:', {
-        message: error.message,
-        status: error?.status,
-        data: error?.data
-      });
-      
-      return text;
+        console.error('Translation error:', {
+            message: error.message,
+            status: error?.status,
+            data: error?.data
+        });
+
+        return text;
     }
-  }
+}
 
 
 
@@ -191,12 +191,30 @@ export async function getRestaurant() {
 export async function getRestDetails() {
     try {
         const restname = await getRestaurant();
+        
         return restname;
 
     } catch {
 
     }
 }
+
+export async function getRestStatics() {
+    try {
+        const restname = await getRestaurant();
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+
+        const { views, categories } = await db.collection(`${restname} Data`).findOne();
+        const itemCount = await db.collection(`${restname}`).countDocuments();
+        const catCount = categories.length
+        return {restname, catCount, itemCount, views};
+
+    } catch {
+
+    }
+}
+
 
 
 
@@ -260,11 +278,15 @@ export async function getItemsThemeText() {
             .findOne(
                 { theme: { $exists: true } },
             );
+        const footer = await db.collection(`${restname} Data`)
+            .findOne(
+                { footerText: { $exists: true } },
+            ) || [];
         const theme = object.theme
         const header = object.header
         const description = object.description
 
-        return { theme, items, header, description };
+        return { theme, items, header, description, footer };
     } catch (error) {
         console.error('Error getting items:', error);
         throw error;
@@ -276,17 +298,17 @@ export async function newCategory(category, isRTL) {
 
     let name_eng, name_heb, description_eng, description_heb;
 
-        if (isRTL) {
-            name_heb = category.name;
-            description_heb = category.description;
-            name_eng = await translateText(category.name, 'heb', 'eng');
-            description_eng = await translateText(category.description, 'heb', 'eng');
-        } else {
-            name_eng = category.name;
-            description_eng = category.description;
-            name_heb = await translateText(category.name, 'eng', 'heb');
-            description_heb = await translateText(category.description, 'eng', 'heb');
-        }
+    if (isRTL) {
+        name_heb = category.name;
+        description_heb = category.description;
+        name_eng = await translateText(category.name, 'heb', 'eng');
+        description_eng = await translateText(category.description, 'heb', 'eng');
+    } else {
+        name_eng = category.name;
+        description_eng = category.description;
+        name_heb = await translateText(category.name, 'eng', 'heb');
+        description_heb = await translateText(category.description, 'eng', 'heb');
+    }
 
     try {
         const restname = await getRestaurant();
@@ -295,13 +317,15 @@ export async function newCategory(category, isRTL) {
         const res = await db.collection(`${restname} Data`).updateOne(
             {},
             {
-                $push: { categories: {
-                    name: name_eng,
-                    name_eng,
-                    name_heb,
-                    description_eng,
-                    description_heb,
-                } }
+                $push: {
+                    categories: {
+                        name: name_eng,
+                        name_eng,
+                        name_heb,
+                        description_eng,
+                        description_heb,
+                    }
+                }
             },
             { upsert: true }
         );
@@ -327,6 +351,7 @@ export async function deleteCategory(category) {
         }, {
             $set: { categories: updatedCATEGORIES }
         });
+        await db.collection(`${restname}`).deleteMany({ category: category.name });
         revalidatePath(`/menu/${restname}`)
         revalidatePath(`/menu/${restname}/selections`)
     } catch (error) {
@@ -416,31 +441,42 @@ export async function deleteOneItem(id) {
 }
 
 
-export async function updateCategory(changedCategory, category) {
+export async function updateCategory(changedCategory, categoryName, isRTL) {
     try {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        await db.collection(`${restname} Data`).updateOne(
-            { "categories.name": category.name },
-            {
-                $set: {
-                    "categories.$[elem].name": changedCategory.name,
-                    "categories.$[elem].description": changedCategory.description,
+
+        if (isRTL) {
+            await db.collection(`${restname} Data`).updateOne(
+                { "categories.name": categoryName },
+                {
+                    $set: {
+                        "categories.$[elem].name_heb": changedCategory.name,
+                        "categories.$[elem].description_heb": changedCategory.description,
+                    }
+                },
+                {
+                    arrayFilters: [{ "elem.name": categoryName }]
                 }
-            },
-            {
-                arrayFilters: [{ "elem.name": category.name }]
-            }
-        );
+            );
+        } else {
+            await db.collection(`${restname} Data`).updateOne(
+                { "categories.name": categoryName },
+                {
+                    $set: {
+                        "categories.$[elem].name_eng": changedCategory.name,
+                        "categories.$[elem].description_eng": changedCategory.description,
+                    }
+                },
+                {
+                    arrayFilters: [{ "elem.name": categoryName }]
+                }
+            );
+        }
+
         revalidatePath(`/menu/${restname}`)
         revalidatePath(`/menu/${restname}/selections`)
-
-
-        await db.collection(restname).updateMany(
-            { category: category.name },
-            { $set: { category: changedCategory.name } }
-        )
 
 
 
@@ -451,24 +487,40 @@ export async function updateCategory(changedCategory, category) {
 }
 
 
-export async function updateItem(id, name, price, description, url, allergens, category) {
+export async function updateItem(id, name, price, description, url, allergens, category, isRTL) {
     try {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        await db.collection(restname).updateOne(
-            { _id: new ObjectId(id) },
-            {
-                $set: {
-                    name,
-                    price,
-                    description,
-                    url,
-                    allergens,
-                    category,
+        if (isRTL) {
+            await db.collection(restname).updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        name_heb: name,
+                        price,
+                        description_heb: description,
+                        url,
+                        allergens,
+                        category,
+                    }
                 }
-            }
-        );
+            );
+        } else {
+            await db.collection(restname).updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        name_eng: name,
+                        price,
+                        description_eng: description,
+                        url,
+                        allergens,
+                        category,
+                    }
+                }
+            );
+        }
         revalidatePath(`/menu/${restname}`)
         revalidatePath(`/menu/${restname}/selections`)
 

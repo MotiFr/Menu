@@ -16,17 +16,25 @@ const LanguageSelector = ({ defaultLang = 'heb' }) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const [currentLang, setCurrentLang] = useState(defaultLang);
+    const urlLang = searchParams.get('lang');
+    const [currentLang, setCurrentLang] = useState(urlLang || defaultLang);
 
     useEffect(() => {
-        const storedLang = localStorage.getItem('preferredLanguage') || defaultLang;
-        if (storedLang !== currentLang) {
-            setCurrentLang(storedLang);
-            const params = new URLSearchParams(searchParams);
-            params.set('lang', storedLang);
-            router.push(`${pathname}?${params.toString()}`);
+        // Update state when URL params change
+        if (urlLang && urlLang !== currentLang) {
+            setCurrentLang(urlLang);
+            localStorage.setItem('preferredLanguage', urlLang);
+        } else if (!urlLang) {
+            // If no lang in URL, use stored preference or default
+            const storedLang = localStorage.getItem('preferredLanguage') || defaultLang;
+            if (storedLang !== currentLang) {
+                setCurrentLang(storedLang);
+                const params = new URLSearchParams(searchParams);
+                params.set('lang', storedLang);
+                router.push(`${pathname}?${params.toString()}`);
+            }
         }
-    }, []);
+    }, [urlLang, searchParams]); // React to URL changes
 
     const handleValueChange = (value) => {
         setCurrentLang(value);

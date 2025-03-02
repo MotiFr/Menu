@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import ThemedBackground from '@/components/Menu/ThemeBG';
 import { categoryClasses, menuItemClasses, themes } from '@/components/Menu/Themes';
 import AutoResizeTextarea from '@/components/Menu/TextareaSize';
+import Footer from '@/components/App/FooterEdit';
 
 const translations = {
   eng: {
@@ -20,7 +21,15 @@ const translations = {
     hebrewTitle: "Hebrew Title",
     englishTitle: "English Title",
     hebrewDesc: "Hebrew Description",
-    englishDesc: "English Description"
+    englishDesc: "English Description",
+    edit: "Edit",
+    save: "Save",
+    cancel: "Cancel",
+    socialLinks: "Social media links",
+    footerText: "Footer text",
+    editFooter: "Edit footer",
+
+
   },
   heb: {
     chooseTheme: "בחר עיצוב",
@@ -32,7 +41,13 @@ const translations = {
     hebrewTitle: "כותרת בעברית",
     englishTitle: "כותרת באנגלית",
     hebrewDesc: "תיאור בעברית",
-    englishDesc: "תיאור באנגלית"
+    englishDesc: "תיאור באנגלית",
+    edit: "ערוך",
+    save: "שמור",
+    cancel: "ביטול",
+    socialLinks: "קישור לרשתות חברתיות",
+    footerText: "טקסט תחתית",
+    editFooter: "ערוך תחתית",
   }
 };
 
@@ -52,10 +67,10 @@ const ThemeButton = ({ themeName, colors, isActive, onClick, setIsThemed }) => (
 export default function MenuPageClient() {
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
-  
+
   useEffect(() => {
     const langParam = searchParams.get('lang');
-    
+
     if (langParam && (langParam === 'eng' || langParam === 'heb')) {
       setCurrentLang(langParam);
     } else {
@@ -79,6 +94,8 @@ export default function MenuPageClient() {
   const [menuTitles, setMenuTitles] = useState({ heb: '', eng: '' });
   const [menuDescriptions, setMenuDescriptions] = useState({ heb: '', eng: '' });
   const [errText, setErrText] = useState('');
+  const [footerText, setFooterText] = useState([]);
+  const [socialLinks, setSocialLinks] = useState([]);
 
   const redirect = useCallback(() => {
     window.location.href = '/';
@@ -103,6 +120,8 @@ export default function MenuPageClient() {
           heb: json.header.heb || '',
           eng: json.header.eng || ''
         });
+        setFooterText(json.footerText);
+        setSocialLinks(json.socialLinks);
 
       } catch (err) {
         setError(err);
@@ -115,26 +134,35 @@ export default function MenuPageClient() {
   }, [redirect]);
 
   if (loading) return (
-    <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t.yourMenu}</h1>
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          <Skeleton className="h-8 w-48 mb-4" />
-          <div className="space-y-4">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                <div className="flex items-center space-x-4">
-                  <Skeleton className="w-20 h-20 rounded-lg flex-shrink-0" />
-                  <div className="flex-1">
-                    <Skeleton className="h-6 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-1/4" />
-                  </div>
-                </div>
-              </div>
+    <div className="min-h-screen transition-all duration-500">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Theme selection and header editing section */}
+        <div className="mb-8 p-6 rounded-xl bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/20 dark:border-black/20">
+          <Skeleton className="h-8 w-48 mx-auto mb-4" />
+
+          {/* Theme buttons - circles */}
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-14 w-14 rounded-full" />
             ))}
           </div>
+
+          {/* Header editing section - everything centered */}
+          <div className="text-center mb-12">
+            <Skeleton className="h-8 w-48 mx-auto mb-4" />
+
+            <div className="space-y-10">
+              <div className="mb-4">
+                <Skeleton className="h-12 w-3/4 mx-auto" />
+              </div>
+
+              <div>
+                <Skeleton className="h-24 w-full mx-auto" />
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   );
@@ -149,7 +177,7 @@ export default function MenuPageClient() {
   async function handleChanges(event) {
     event.preventDefault();
     setLoadingChage(true);
-    
+
     if (menuTitles.heb.length > 150 || menuTitles.eng.length > 150) {
       setErrText(t.headerTooLong);
       setLoadingChage(false);
@@ -199,70 +227,70 @@ export default function MenuPageClient() {
   const textDirection = currentLang === 'heb' ? 'rtl' : 'ltr';
 
   return (
-    
-      <div className="min-h-screen transition-all duration-500" dir={textDirection}>
-        <ThemedBackground theme={currentTheme} />
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="mb-8 p-6 rounded-xl bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/20 dark:border-black/20">
-            <h2 className="text-lg font-semibold mb-4 text-center">{t.chooseTheme}</h2>
-            <div className="flex flex-wrap justify-center gap-2">
-              {Object.entries(themes).map(([name, colors]) => (
-                <ThemeButton
-                  key={name}
-                  themeName={name}
-                  colors={colors}
-                  isActive={currentTheme === name}
-                  onClick={setCurrentTheme}
-                  setIsThemed={setIsThemed}
-                />
-              ))}
-            </div>
-  
-            <div className="text-center mb-12">
-              <h2 className="text-lg font-semibold mb-4 text-center mt-6">{t.editHeader}</h2>
-              <form onSubmit={handleChanges}>
-                <div className="space-y-4">
-                  <div className="mb-4">
-                    <AutoResizeTextarea
-                      className="bg-inherit text-4xl font-bold w-full text-center"
-                      placeholder={currentLang === 'heb' ? "כותרת בעברית" : "English Title"}
-                      value={menuTitles[currentLang]}
-                      onChange={e => {
-                        setMenuTitles(prev => ({ ...prev, [currentLang]: e.target.value }));
-                        setIsThemed(true);
-                      }}
-                      dir={currentLang === 'heb' ? 'rtl' : 'ltr'}
-                    />
-                  </div>
-  
-                  <div>
-                    <AutoResizeTextarea
-                      className="bg-inherit text-lg opacity-80 w-full text-center"
-                      placeholder={currentLang === 'heb' ? "תיאור בעברית" : "English Description"}
-                      value={menuDescriptions[currentLang]}
-                      onChange={e => {
-                        setMenuDescriptions(prev => ({ ...prev, [currentLang]: e.target.value }));
-                        setIsThemed(true);
-                      }}
-                      dir={currentLang === 'heb' ? 'rtl' : 'ltr'}
-                    />
-                  </div>
-                </div>
-  
-                <div className='w-full relative mt-14'>
-                  {isThemed && (
-                    <button
-                      className={`absolute right-4 bottom-5 m-2 p-2 text-xs font-medium text-white rounded-lg shadow-lg transition-colors duration-200 ${loadingChange ? 'bg-primary-light cursor-not-allowed' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
-                      type="submit"
-                    >
-                      {t.saveChanges}
-                    </button>
-                  )}
-                  <div className='text-lg text-red-500'>{errText}</div>
-                </div>
-              </form>
-            </div>
+
+    <div className="min-h-screen transition-all duration-500" dir={textDirection}>
+      <ThemedBackground theme={currentTheme} />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8 p-6 rounded-xl bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/20 dark:border-black/20">
+          <h2 className="text-lg font-semibold mb-4 text-center">{t.chooseTheme}</h2>
+          <div className="flex flex-wrap justify-center gap-2">
+            {Object.entries(themes).map(([name, colors]) => (
+              <ThemeButton
+                key={name}
+                themeName={name}
+                colors={colors}
+                isActive={currentTheme === name}
+                onClick={setCurrentTheme}
+                setIsThemed={setIsThemed}
+              />
+            ))}
           </div>
+
+          <div className="text-center mb-12">
+            <h2 className="text-lg font-semibold mb-4 text-center mt-6">{t.editHeader}</h2>
+            <form onSubmit={handleChanges}>
+              <div className="space-y-4">
+                <div className="mb-4">
+                  <AutoResizeTextarea
+                    className="bg-inherit text-4xl font-bold w-full text-center"
+                    placeholder={currentLang === 'heb' ? "כותרת בעברית" : "English Title"}
+                    value={menuTitles[currentLang]}
+                    onChange={e => {
+                      setMenuTitles(prev => ({ ...prev, [currentLang]: e.target.value }));
+                      setIsThemed(true);
+                    }}
+                    dir={currentLang === 'heb' ? 'rtl' : 'ltr'}
+                  />
+                </div>
+
+                <div>
+                  <AutoResizeTextarea
+                    className="bg-inherit text-lg opacity-80 w-full text-center"
+                    placeholder={currentLang === 'heb' ? "תיאור בעברית" : "English Description"}
+                    value={menuDescriptions[currentLang]}
+                    onChange={e => {
+                      setMenuDescriptions(prev => ({ ...prev, [currentLang]: e.target.value }));
+                      setIsThemed(true);
+                    }}
+                    dir={currentLang === 'heb' ? 'rtl' : 'ltr'}
+                  />
+                </div>
+              </div>
+
+              <div className='w-full relative mt-14'>
+                {isThemed && (
+                  <button
+                    className={`absolute right-4 bottom-5 m-2 p-2 text-xs font-medium text-white rounded-lg shadow-lg transition-colors duration-200 ${loadingChange ? 'bg-primary-light cursor-not-allowed' : 'bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark'}`}
+                    type="submit"
+                  >
+                    {t.saveChanges}
+                  </button>
+                )}
+                <div className='text-lg text-red-500'>{errText}</div>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <div className="space-y-8">
           {CATEGORIES && CATEGORIES.length > 0 && (
@@ -294,9 +322,10 @@ export default function MenuPageClient() {
                                   src={item.url}
                                   alt={item[`name_${currentLang}`]}
                                   fill
+                                  sizes='10'
                                   className="rounded-lg object-cover"
                                   onError={(e) => {
-                                    e.target.style.display = 'none';
+                                    e.target.closest('.flex-shrink-0').style.display = 'none';
                                   }}
                                 />
                               </div>
@@ -319,6 +348,13 @@ export default function MenuPageClient() {
           )}
         </div>
       </div>
+
+      <Footer
+        currentLang={currentLang}
+        currentTheme={currentTheme}
+        t={t}
+        footer={{socialLinks, footerText}}
+      />
 
       <MenuItemDialog
         theme={currentTheme}

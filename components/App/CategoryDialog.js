@@ -35,7 +35,8 @@ export default function CategoryDialog({ setRefresh, category, isOpen, onClose, 
                 },
                 body: JSON.stringify({
                     changedCategory: changedCategory,
-                    category: category,
+                    categoryName: category.name,
+                    isRTL,
                 }),
             });
 

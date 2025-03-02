@@ -73,7 +73,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         }
 
         if (!formData.price) {
-            setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a price" , "בבקשה הכנס מחיר")}</span>);
+            setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a price", "בבקשה הכנס מחיר")}</span>);
             setLoading(false);
             return;
         }
@@ -91,6 +91,34 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         }
         setSubmission(<span className="text-red-600"></span>);
 
+        let allergens = item.allergens;
+
+        if (isRTL) {
+            for (let i = 0; i < allergens.length; i++) {
+                if (selectedAllergens[i]) {
+                    allergens[i].heb = selectedAllergens[i];
+                }
+            }
+
+            if (selectedAllergens.length > allergens.length) {
+                for (let i = allergens.length; i < selectedAllergens.length; i++) {
+                    allergens.push({ eng: "", heb: selectedAllergens[i] });
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < allergens.length; i++) {
+                if (selectedAllergens[i]) {
+                    allergens[i].eng = selectedAllergens[i];
+                }
+            }
+
+            if (selectedAllergens.length > allergens.length) {
+                for (let i = allergens.length; i < selectedAllergens.length; i++) {
+                    allergens.push({ eng: selectedAllergens[i] , heb: "" });
+                }
+            }
+        }
 
         try {
 
@@ -102,7 +130,8 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                 body: JSON.stringify({
                     _id: item._id,
                     ...formData,
-                    allergens: selectedAllergens,
+                    allergens: allergens,
+                    isRTL: isRTL
                 }),
             });
 
@@ -189,7 +218,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {getLocalizedValue("Image URL" ,"קישור לתמונה")}
+                            {getLocalizedValue("Image URL", "קישור לתמונה")}
                         </label>
                         <input
                             type="url"
@@ -217,7 +246,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
                     <div>
                         <label htmlFor="allergens" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                           {getLocalizedValue(" Allergens, Additional comments (comma-separated)", "אלרגיות והערות נוספות (כל הערה מופרדת עם פסיק)")}
+                            {getLocalizedValue(" Allergens, Additional comments (comma-separated)", "אלרגיות והערות נוספות (כל הערה מופרדת עם פסיק)")}
                         </label>
                         <input
                             type="text"

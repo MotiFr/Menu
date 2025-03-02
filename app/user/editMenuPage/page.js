@@ -129,7 +129,9 @@ export default function EditMenuPageClient() {
 
   if (loading) {
     return (
-      <SkeletonEditMenu />
+      <SkeletonEditMenu
+      isRTL= {isRTL}
+        />
     )
   }
 
@@ -515,7 +517,7 @@ export default function EditMenuPageClient() {
                 </div>
                 <div className="flex justify-end items-center space-x-4">
                   <div className="flex flex-col items-start space-y-2">
-                    <span className="font-medium">
+                    <span className="ml-4 font-medium">
                       {submissionCat}
                     </span>
                   </div>
@@ -533,9 +535,9 @@ export default function EditMenuPageClient() {
           <div className="mt-8 space-y-8">
             {CATEGORIES && CATEGORIES.length > 0 ? (
               CATEGORIES.map((category, indexer) => {
-                const Citems = items.filter((item) => item.category === category.name_eng);
+                const Citems = items.filter((item) => item.category === category.name);
                 return (
-                  <div key={category.name_eng}>
+                  <div key={category.name}>
                     <CategoryDropDown
                       setRefresh={setRefresh}
                       category={category}
@@ -617,11 +619,11 @@ export default function EditMenuPageClient() {
                               <h3 className={item.seen ? `text-lg font-medium text-black dark:text-white line-clamp-1` : `line-clamp-1 text-lg font-medium text-gray-500 dark:text-gray-400`}>
                                 {getLocalizedValue(item.name_eng, item.name_heb)}
                               </h3>
-                              <p className={item.seen ? `mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1` : `mt-1 text-sm text-gray-400 dark:text-gray-400 line-clamp-1`}>
-                                {getLocalizedValue(item.description_eng, item.description_heb)}
+                              <p className={item.seen ? `mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 max-w-64` : `mt-1 text-sm text-gray-400 dark:text-gray-400 line-clamp-1 max-w-64`}>
+                              {getLocalizedValue(item.description_eng, item.description_heb)}
                               </p>
-                              <div className={getLocalizedValue("absolute bottom-2 right-12", "absolute bottom-2 left-32")}>
-                                <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
+                              <div className={item.url ? getLocalizedValue("absolute bottom-2 right-12", "absolute bottom-2 left-32") : getLocalizedValue("absolute bottom-3 right-12", "absolute bottom-3 left-10")}>
+                              <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
                                   {item.price}
                                 </p>
                               </div>

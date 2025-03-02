@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, User, Mail, Store, Phone } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import TermsOfServiceDialog from "./TermsOf";
 
 export default function SignUp() {
 
@@ -32,6 +33,8 @@ export default function SignUp() {
     const [emails, setEmails] = useState();
     const [userNames, setUserNames] = useState();
     const [fetching, setFetching] = useState(true);
+    const [errTerms, setErrTerms] = useState('')
+    const [terms, setTerms] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -41,10 +44,10 @@ export default function SignUp() {
                 const emails = json.users.map(user => user.email);
                 const usernames = json.users.map(user => user.username);
                 setEmails(emails);
-                setUserNames(usernames); 
+                setUserNames(usernames);
                 setFetching(false);
 
-            
+
             } catch (err) {
                 setErrLanguages('Something went wrong, please try again');
             }
@@ -106,6 +109,7 @@ export default function SignUp() {
         setErrRestaurantName('');
         setErrLanguages('');
         setErrPhone('');
+        setErrTerms('')
 
         if (userNames.includes(formData.username)) {
             setErrUsername('Username already exists');
@@ -160,6 +164,11 @@ export default function SignUp() {
         if (!formData.languages.english && !formData.languages.hebrew) {
             setErrLanguages('Select at least one language');
             setIsLoading(false);
+            return;
+        }
+        if (!terms) {
+            setIsLoading(false);
+            setErrTerms('Pleas agree to the terms of service');
             return;
         }
         if (fetching) {
@@ -385,6 +394,24 @@ export default function SignUp() {
                         </div>
                         <span className="text-red-500 text-sm">
                             {errLanguages}
+                        </span>
+                    </div>
+
+                    <div className="">
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-3 bg-gray-50 dark:bg-gray-800 p-2 rounded-md">
+                                <Label htmlFor="english" className="cursor-pointer">By checking here I accept the {<TermsOfServiceDialog />}</Label>
+                                <Checkbox
+                                    id="terms"
+                                    onCheckedChange={(isChecked) => setTerms(isChecked)}
+                                    onClick={() => setErrTerms('')}
+                                    onBlur={handleBlur}
+                                />
+
+                            </div>
+                        </div>
+                        <span className="text-red-500 text-sm">
+                            {errTerms}
                         </span>
                     </div>
 

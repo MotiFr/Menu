@@ -191,7 +191,7 @@ export async function getRestaurant() {
 export async function getRestDetails() {
     try {
         const restname = await getRestaurant();
-        
+
         return restname;
 
     } catch {
@@ -208,13 +208,46 @@ export async function getRestStatics() {
         const { views, categories } = await db.collection(`${restname} Data`).findOne();
         const itemCount = await db.collection(`${restname}`).countDocuments();
         const catCount = categories.length
-        return {restname, catCount, itemCount, views};
+        return { restname, catCount, itemCount, views };
 
-    } catch {
-
+    } catch (error) {
+        console.error('Error storing new item:', error);
+        throw error;
     }
 }
 
+
+export async function getLanguages() { 
+    try {
+        const restname = await getRestaurant();
+        const client = await getMongoClient();
+        const db = client.db("data");
+
+        const { languages } = await db.collection(`users`).findOne(
+            { username: restname }
+        );
+        return { languages };
+
+    } catch (error) {
+        console.error('Error storing new item:', error);
+        throw error;
+    }
+}
+
+export async function getLanguagesMenu(restname) { 
+    try {
+        const client = await getMongoClient();
+        const db = client.db("data");
+        const { languages } = await db.collection(`users`).findOne(
+            { username: restname }
+        );
+        return { languages };
+
+    } catch (error) {
+        console.error('Error storing new item:', error);
+        throw error;
+    }
+}
 
 
 

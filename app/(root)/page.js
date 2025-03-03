@@ -20,9 +20,9 @@ export default function Home() {
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
               <div className="rounded-md shadow">
-                <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark md:py-4 md:text-lg md:px-10 transition-colors duration-200">
+                {/* <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark md:py-4 md:text-lg md:px-10 transition-colors duration-200">
                   Get Started
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
@@ -61,12 +61,12 @@ export default function Home() {
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
               Ready to modernize your restaurant?
             </h2>
-            <p className="mt-4 text-lg leading-6 text-primary-light">
+            {/* <p className="mt-4 text-lg leading-6 text-primary-light">
               Join thousands of restaurants already using MenuQR to enhance their dining experience.
-            </p>
-            <button className="mt-8 bg-white dark:bg-gray-900 text-primary-bg dark:text-primary-dark px-8 py-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+            </p> */}
+            {/* <button className="mt-8 bg-white dark:bg-gray-900 text-primary-bg dark:text-primary-dark px-8 py-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
               Start Free Trial
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

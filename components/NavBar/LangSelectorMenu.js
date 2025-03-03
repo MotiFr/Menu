@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import Image from 'next/image';
 
-const LanguageSelector = ({ defaultLang = 'eng' }) => {
+const LanguageSelectorMenu = ({ defaultLang = 'eng', restname }) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -28,7 +28,13 @@ const LanguageSelector = ({ defaultLang = 'eng' }) => {
         const fetchLanguages = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('/api/languages');
+                const response = await fetch('/api/languagesMenu', {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({restname})
+                });
                 if (!response.ok) throw new Error('Failed to fetch languages');
                 const lang = await response.json();
                 const data = lang.languages;
@@ -143,4 +149,4 @@ const LanguageSelector = ({ defaultLang = 'eng' }) => {
     );
 };
 
-export default LanguageSelector;
+export default LanguageSelectorMenu;

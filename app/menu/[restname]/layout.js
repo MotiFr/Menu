@@ -62,6 +62,7 @@ export default async function RestaurantLayout({ params, children }) {
         <div className="min-h-screen flex flex-col">
             <Suspense fallback={<LoadingSkeleton />}>
                 <NavTopMenu
+                    restname={restname}
                     theme={theme}
                 />
                 <main className="flex-1">

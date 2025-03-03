@@ -461,7 +461,7 @@ export default function EditMenuPageClient() {
 
                 <div className="flex justify-end items-center space-x-4">
                   <div className="flex flex-col items-start space-y-2">
-                    <span className="font-medium">
+                    <span className="font-medium m-2">
                       {submission}
                     </span>
                   </div>

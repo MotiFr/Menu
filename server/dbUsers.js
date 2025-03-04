@@ -26,8 +26,9 @@ export async function getUserNEmail() {
     }
 }
 
-export async function signUp(username, password, email, restaurantName, phone, languages) {
+export async function signUp(usernameUpp, password, email, restaurantName, phone, languages) {
     try {
+        const username = usernameUpp.toLowerCase();
         const hashedPassword = await hashPassword(password);
         const client = await getMongoClient();
         const db = client.db("data");
@@ -51,7 +52,7 @@ export async function signUp(username, password, email, restaurantName, phone, l
         const updatedUser = await db.collection("users").findOne({ username: username });
         await createAuthSession(updatedUser._id);
         await createDummyItems(username);
-        await createDummyCategories(username, restaurantName);
+        await createDummyCategories(username);
         await resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL,
             to: email,
@@ -112,7 +113,7 @@ async function createDummyItems(username) {
 }
 
 
-async function createDummyCategories(username) {
+export async function createDummyCategories(username) {
     try {
         const client = await getMongoClient();
         const db = client.db("restaurant");

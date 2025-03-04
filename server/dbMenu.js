@@ -108,7 +108,6 @@ export async function getRestInfo(restname) {
         return { items, categories, theme, header, description, footerText, socialLinks };
     } catch (error) {
         console.error('Error getting restaurant info:', error);
-        throw new Error('Failed to fetch restaurant information');
     }
 }
 

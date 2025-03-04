@@ -217,6 +217,7 @@ export async function getRestStatics() {
 }
 
 
+
 export async function getLanguages() { 
     try {
         const restname = await getRestaurant();
@@ -244,7 +245,7 @@ export async function getLanguagesMenu(restname) {
         return { languages };
 
     } catch (error) {
-        console.error('Error storing new item:', error);
+        console.error('error fetching rest language', error);
         throw error;
     }
 }

@@ -111,11 +111,17 @@ export default function SignUp() {
         setErrPhone('');
         setErrTerms('')
 
+        if (!/^[a-zA-Z]+$/.test(formData.username)) {
+            setErrUsername('Username must be in English');
+            setIsLoading(false);
+            return;
+        }
         if (userNames.includes(formData.username)) {
             setErrUsername('Username already exists');
             setIsLoading(false);
             return;
         }
+        
         if (emails.includes(formData.email)) {
             setErrEmail('Email already exists');
             setIsLoading(false);
@@ -199,7 +205,7 @@ export default function SignUp() {
 
 
         } catch (error) {
-
+            console.log(error)
         }
         finally {
             setIsLoading(false);

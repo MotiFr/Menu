@@ -23,12 +23,19 @@ const MenuFooter = ({ currentLang, currentTheme, Footer }) => {
         const url = socialLinks[platform];
         const Icon = icon;
 
+        const formatUrl = (url) => {
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+              return `https://${url}`;
+            }
+            return url;
+          };
+
         if (!url) return null;
 
         return (
             <a
                 href={platform === 'email' ? `mailto:${url}` :
-                    platform === 'phone' ? `tel:${url}` : url}
+                    platform === 'phone' ? `tel:${url}` : formatUrl(url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block p-2 rounded-full bg-white/10 dark:bg-black/10 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300"
@@ -49,7 +56,7 @@ const MenuFooter = ({ currentLang, currentTheme, Footer }) => {
             currentTheme === 'dark' ? 'bg-black/30 border-black/20' :
             'bg-white/30 dark:bg-black/30 border-white/20 dark:border-black/20'
         } backdrop-blur-md border`}>
-            <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex flex-col justify-between items-center">
                 {footerText[currentLang] && (
                     <div className="mb-4 md:mb-0 text-center">
                         <p dir={currentLang === 'heb' ? 'rtl' : 'ltr'} className="opacity-80 text-lg">

@@ -67,6 +67,14 @@ const Footer = ({ currentLang, currentTheme, t, footer }) => {
         const url = socialLinks[platform];
         const Icon = icon;
 
+        const formatUrl = (url) => {
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+              return `https://${url}`;
+            }
+            return url;
+          };
+          
+
         return (
             <div className="relative group">
                 {isEditing ? (
@@ -84,7 +92,7 @@ const Footer = ({ currentLang, currentTheme, t, footer }) => {
                     url && (
                         <a
                             href={platform === 'email' ? `mailto:${url}` :
-                                platform === 'phone' ? `tel:${url}` : url}
+                                platform === 'phone' ? `tel:${url}` : formatUrl(url)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-block p-2 rounded-full bg-white/10 dark:bg-black/10 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300"

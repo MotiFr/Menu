@@ -9,7 +9,7 @@ const getCachedRestInfo = unstable_cache(
     return await getRestInfo(restname);
   },
   ['rest-info'],
-  { revalidate: 10 }
+  { revalidate: 3600 }
 );
 
 export async function generateStaticParams() {
@@ -44,8 +44,21 @@ export default async function Menu({ params, searchParams }) {
 
   const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
   try {
-    const { categories: CATEGORIES, theme, header, description, items, footerText, socialLinks } = await getCachedRestInfo(restname);
+    let restInfo = await getCachedRestInfo(restname);
+    
+    if (!restInfo || !restInfo.categories) {
+      console.log(`Initial data fetch missing categories for ${restname}, retrying...`);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      restInfo = await getCachedRestInfo(restname);
+    }
+    
+    if (!restInfo || !restInfo.categories) {
+      throw new Error(`Failed to get valid restaurant data for ${restname} after retry`);
+    }
+
+    const { categories: CATEGORIES, theme, header, description, items, footerText, socialLinks } = restInfo;
     const menu = items.map(item => ({ ...item, _id: item._id.toString() }));
+    
     return (
       <Def
         CATEGORIES={CATEGORIES}

@@ -9,6 +9,7 @@ import ThemedBackground from '@/components/Menu/ThemeBG';
 import { categoryClasses, menuItemClasses, themes } from '@/components/Menu/Themes';
 import AutoResizeTextarea from '@/components/Menu/TextareaSize';
 import Footer from '@/components/App/FooterEdit';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const translations = {
   eng: {
@@ -299,13 +300,18 @@ export default function MenuPageClient() {
               if (items.length === 0) return null;
 
               return (
-                <div
+                <details
                   key={category.name}
-                  className={`${categoryClasses[currentTheme]} rounded-2xl border backdrop-blur-md p-2`}
+                  className={`${categoryClasses[currentTheme]} rounded-2xl border backdrop-blur-md p-2 group`}
                 >
-                  <h2 className="text-2xl font-bold mb-2">{category[`name_${currentLang}`]}</h2>
-                  <p className="opacity-80 mb-8">{category[`description_${currentLang}`]}</p>
-
+                  <summary className="pb-4 justify-between items-center cursor-pointer list-none select-none">
+                    <h2 className="text-2xl font-bold mb-2">{category[`name_${currentLang}`]}</h2>
+                    <p className="opacity-80">{category[`description_${currentLang}`]}</p>
+                    <span className={`${currentLang === 'heb' ? 'left-2 group-open:rotate-90' : 'right-2 group-open:-rotate-90'} top-2 text-xl absolute transform transition-transform duration-300 `}>
+                      {currentLang === 'heb' ? <ChevronRight /> : <ChevronLeft />}
+                    </span>
+                  </summary>
+                  
                   <div className="space-y-2">
                     {items.map((item) => (
                       item.seen && (
@@ -342,7 +348,7 @@ export default function MenuPageClient() {
                       )
                     ))}
                   </div>
-                </div>
+                </details>
               );
             })
           )}
@@ -353,7 +359,7 @@ export default function MenuPageClient() {
         currentLang={currentLang}
         currentTheme={currentTheme}
         t={t}
-        footer={{socialLinks, footerText}}
+        footer={{ socialLinks, footerText }}
       />
 
       <MenuItemDialog

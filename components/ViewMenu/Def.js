@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import MenuFooter from "../Menu/FooterView";
 import MenuCard from "../Menu/MenuCard";
 import ThemedBackground from "../Menu/ThemeBG";
@@ -30,7 +31,6 @@ export default function Def({ CATEGORIES, theme, header, description, menu, foot
                 <details
                   key={category.name}
                   className={`${categoryClasses[theme]} rounded-2xl border backdrop-blur-md p-2 group`}
-                  open
                 >
                   <summary className="pb-4 justify-between items-center cursor-pointer list-none select-none">
                     <h2 className={`text-2xl font-bold mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -40,7 +40,7 @@ export default function Def({ CATEGORIES, theme, header, description, menu, foot
                       {getLocalizedValue(category.description_eng, category.description_heb)}
                     </p>
                     <span className={`${isRTL ? 'left-2 group-open:rotate-90' : 'right-2 group-open:-rotate-90'} top-2 text-xl absolute transform transition-transform duration-300 `}>
-                      {isRTL ? "►" : "◄"}
+                      {isRTL ? <ChevronRight /> : <ChevronLeft />}
                     </span>
                   </summary>
 

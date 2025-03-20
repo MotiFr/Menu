@@ -33,19 +33,22 @@ export default function MenuItemDialog({ theme = 'default', item, isOpen, onClos
         </DialogHeader>
 
         {item.url && (
-          <div className="mt-4 relative h-48 w-full">
-            <Image
-              src={item.url}
-              alt={item.name}
-              fill
-              sizes="(max-width: 600px) 80vw, (max-width: 1200px) 40vw, 25vw"
-              className="rounded-lg object-cover"
-              onError={(e) => {
-                e.target.closest('.relative').style.display = 'none';
-              }}
-            />
-          </div>
+          <div className="mt-4 relative h-72">
+          <Image
+            src={item.url}
+            alt={item.name}
+            fill
+            sizes="(max-width: 1200px) 40vw, 25vw"
+            className="rounded-lg object-cover"
+            onError={(e) => {
+              e.target.closest('.relative').style.display = 'none';
+            }}
+          />
+        </div>
+        
+        
         )}
+        
 
         <div className="mt-4 max-h-48 overflow-y-auto">
           <p className={`text-sm ${theme === 'default' ? 'text-gray-600 dark:text-gray-300' : 'text-black/70 dark:text-white/70'}`}>

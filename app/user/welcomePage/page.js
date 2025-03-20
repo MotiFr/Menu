@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import SettingsDialog from "@/components/App/AdditionalSet";
+import Link from "next/link";
+import PremiumSubscription from "@/components/App/Premium";
 
 const translations = {
   eng: {
@@ -21,7 +23,8 @@ const translations = {
     active: "Active",
     contact: "Additional settings / contact support",
     additional1: "Want some more settings like: background image, special URL, QR with logo and more",
-    additional2: "Contact us"
+    additional2: "Contact us",
+    premium: "Get premium"
   },
   heb: {
     welcome: "ברוך שובך",
@@ -38,6 +41,7 @@ const translations = {
     contact: "הגדרות נוספות / יצירת קשר",
     additional1: "רוצה הגדרות נוספות כמו: תמונת רקע מיוחדת, קישור URL מיוחד, קוד QR עם סמל המסעדה ועוד",
     additional2: "צור קשר",
+    premium: "שדרג לפרימיום"
   }
 };
 
@@ -45,10 +49,10 @@ const translations = {
 export default function WelcomePageClient() {
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
-  
+
   useEffect(() => {
     const langParam = searchParams.get('lang');
-    
+
     if (langParam && (langParam === 'eng' || langParam === 'heb')) {
       setCurrentLang(langParam);
     } else {
@@ -58,7 +62,7 @@ export default function WelcomePageClient() {
       }
     }
   }, [searchParams]);
-  
+
   const { Canvas } = useQRCode();
   const [loading, setLoading] = useState(true);
   const [fullUrl, setFullUrl] = useState('');
@@ -72,7 +76,7 @@ export default function WelcomePageClient() {
 
   const downloadQRCode = () => {
     if (!qrRef.current) return;
-    
+
     const canvas = qrRef.current.querySelector('canvas');
     if (!canvas) return;
 
@@ -165,7 +169,7 @@ export default function WelcomePageClient() {
   }
 
   return (
-    
+
     <div className="max-w-4xl mx-auto" dir={currentLang === 'heb' ? 'rtl' : 'ltr'}>
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
         <div className="flex items-center justify-between">
@@ -202,7 +206,7 @@ export default function WelcomePageClient() {
               </div>
             </div>
             <div className="mt-4 flex justify-center">
-              <button 
+              <button
                 onClick={downloadQRCode}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary dark:bg-primary-dark hover:bg-primary-hover dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
@@ -226,16 +230,20 @@ export default function WelcomePageClient() {
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.categories}</dt>
                 <dd className="mt-1 text-2xl font-semibold text-primary dark:text-primary-dark">{catCount}</dd>
               </div>
-              
+
             </dl>
           </div>
         </div>
 
         <div className="mt-8">
-        <div className="mt-4 grid grid-cols-1 gap-4">
-            <SettingsDialog 
-            currentLang={currentLang}
-            t={t}
+          {/* <div className="mt-4 grid grid-cols-1 gap-4">
+          <PremiumSubscription t={t} />
+
+          </div> */}
+          <div className="mt-4 grid grid-cols-1 gap-4">
+            <SettingsDialog
+              currentLang={currentLang}
+              t={t}
             />
           </div>
           <div className="mt-4 grid grid-cols-1 gap-4">

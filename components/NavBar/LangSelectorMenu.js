@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import Image from 'next/image';
 
-const LanguageSelectorMenu = ({ defaultLang = 'eng', restname }) => {
+const LanguageSelectorMenu = ({ defaultLang = 'heb', restname }) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -110,7 +110,7 @@ const LanguageSelectorMenu = ({ defaultLang = 'eng', restname }) => {
     return (
         <Select value={currentLang} onValueChange={handleValueChange} disabled={isLoading}>
             <SelectTrigger className="w-[100px]">
-                <SelectValue placeholder={currentLang === 'eng' ? 'EN' : 'HEB'} />
+                <SelectValue placeholder={currentLang === 'heb' ? 'HEB' : 'ENG'} />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>

@@ -4,7 +4,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATEGORIES, getLocalizedValue, isRTL }) {
     const [formData, setFormData] = useState({
@@ -15,8 +15,10 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         url: '',
         allergens: '',
     });
+    const [enteredFile, setEnteredFile] = useState(null);
     const [submission, setSubmission] = useState('');
     const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (item) {
@@ -28,14 +30,13 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                 url: item.url || '',
                 allergens: Array.isArray(item.allergens) ? getLocalizedValue(item.allergens.map(allergen => allergen.eng).join(', '), item.allergens.map(allergen => allergen.heb).join(', ')) : '',
             });
+            setEnteredFile(null);
         }
     }, [item, isRTL]);
 
-
     useEffect(() => {
         setSubmission(<span></span>);
-
-    }, [formData])
+    }, [formData, enteredFile]);
 
     if (!item) return null;
 
@@ -47,11 +48,16 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
         }));
     };
 
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setEnteredFile(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setSubmission(<span className="text-red-600"></span>);
-
 
         let selectedAllergens = "";
 
@@ -89,6 +95,17 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
             setLoading(false);
             return;
         }
+
+        // Validate image file if provided
+        if (enteredFile) {
+            const fileType = enteredFile.type;
+            if (fileType !== "image/jpeg" && fileType !== "image/png") {
+                setSubmission(<span className="text-red-600">{getLocalizedValue("Please upload a JPEG or PNG image", "קבצי JPEG או PNG ")}</span>);
+                setLoading(false);
+                return;
+            }
+        }
+
         setSubmission(<span className="text-red-600"></span>);
 
         let allergens = item.allergens;
@@ -115,12 +132,33 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
 
             if (selectedAllergens.length > allergens.length) {
                 for (let i = allergens.length; i < selectedAllergens.length; i++) {
-                    allergens.push({ eng: selectedAllergens[i] , heb: "" });
+                    allergens.push({ eng: selectedAllergens[i], heb: "" });
                 }
             }
         }
 
         try {
+            let imageUrl = formData.url;
+
+            // Upload image if a file was selected
+            if (enteredFile) {
+                const imageFormData = new FormData();
+                imageFormData.append('image', enteredFile);
+
+                const uploadResponse = await fetch('/api/uploadImage', {
+                    method: 'POST',
+                    body: imageFormData,
+                });
+
+                if (!uploadResponse.ok) {
+                    setSubmission(<span className="text-red-600">{getLocalizedValue("Failed to upload image, please try again later.", "העלאת התמונה נכשלה, אנא נסה שוב מאוחר יותר.")}</span>);
+                    setLoading(false);
+                    return;
+                }
+
+                const uploadData = await uploadResponse.json();
+                imageUrl = uploadData.url;
+            }
 
             const response = await fetch('/api/updateItem', {
                 method: 'POST',
@@ -130,6 +168,7 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                 body: JSON.stringify({
                     _id: item._id,
                     ...formData,
+                    url: imageUrl, // Use the uploaded image URL or existing URL
                     allergens: allergens,
                     isRTL: isRTL
                 }),
@@ -144,13 +183,14 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                     url: '',
                     allergens: '',
                 });
+                setEnteredFile(null);
                 setRefresh(prev => !prev);
                 onClose();
             } else {
-                setSubmission(<span className="text-red-600">Failed to save.</span>);
+                setSubmission(<span className="text-red-600">{getLocalizedValue("Failed to save.", "השמירה נכשלה.")}</span>);
             }
         } catch (error) {
-            setSubmission(<span className="text-red-600">Failed to save.</span>);
+            setSubmission(<span className="text-red-600">{getLocalizedValue("Failed to save.", "השמירה נכשלה.")}</span>);
         } finally {
             setLoading(false);
         }
@@ -213,21 +253,47 @@ export default function EditMenuDialog({ setRefresh, item, isOpen, onClose, CATE
                                 </option>
                             ))}
                         </select>
-
                     </div>
 
                     <div>
-                        <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {getLocalizedValue("Image URL", "קישור לתמונה")}
+                        <label htmlFor="imageOptions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {getLocalizedValue("Image", "תמונה")}
                         </label>
-                        <input
-                            type="url"
-                            id="url"
-                            name="url"
-                            value={formData.url}
-                            onChange={handleInputChange}
-                            className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
-                        />
+                        
+                        <div className="space-y-3">
+                            <div>
+                                <label htmlFor="url" className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                    {getLocalizedValue("Image URL", "קישור לתמונה")}
+                                </label>
+                                <input
+                                    type="url"
+                                    id="url"
+                                    name="url"
+                                    value={formData.url}
+                                    onChange={handleInputChange}
+                                    className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label htmlFor="file" className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                    {getLocalizedValue("Or upload an image", "או העלה תמונה")}
+                                </label>
+                                <input
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    type="file"
+                                    id="file"
+                                    accept="image/png, image/jpeg"
+                                    className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-md focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-transparent"
+                                />
+                                {enteredFile && (
+                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        {getLocalizedValue("Selected file: ", "קובץ נבחר: ")}{enteredFile.name}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     <div>

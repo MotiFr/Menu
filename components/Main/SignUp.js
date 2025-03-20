@@ -172,11 +172,11 @@ export default function SignUp() {
             setIsLoading(false);
             return;
         }
-        // if (!terms) {
-        //     setIsLoading(false);
-        //     setErrTerms('Pleas agree to the terms of service');
-        //     return;
-        // }
+        if (!terms) {
+            setIsLoading(false);
+            setErrTerms('Pleas agree to the terms of service');
+            return;
+        }
         if (fetching) {
             setIsLoading(false);
             setErrLanguages('Something went wrong, please try again');

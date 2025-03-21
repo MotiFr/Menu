@@ -1,64 +1,118 @@
-"use server"
 import { getRestaurantsNames, getRestInfo } from "@/server/dbMenu";
 import { revalidatePath, unstable_cache } from 'next/cache';
 import ErrorRetryButton from "@/components/Menu/ReloadButton";
 import Def from "@/components/ViewMenu/Def";
 
-const getCachedRestInfo = unstable_cache(
-  async (restname) => {
-    return await getRestInfo(restname);
-  },
-  ['rest-info', restname],
-  { revalidate: 3600 }
-);
+export const dynamic = 'force-static';
+export const revalidate = 3600; 
+
+async function fetchRestaurantData(restname) {
+  "use server";
+  
+  const getCachedRestInfo = async (restname) => {
+    return unstable_cache(
+      async () => {
+        const data = await getRestInfo(restname);
+        if (!data || !data.categories) {
+          console.error(`Invalid data structure for ${restname}`);
+        }
+        return data;
+      },
+      ['rest-info', restname],
+      { revalidate: 3600 }
+    )();
+  };
+  
+  const getFreshData = async (restname) => {
+    console.log(`Performing fresh data fetch for ${restname}`);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return await getRestInfo(restname);
+    } catch (error) {
+      console.error(`Fresh data fetch failed for ${restname}:`, error);
+      throw error;
+    }
+  };
+  
+  let restInfo = await getCachedRestInfo(restname);
+  
+  if (!restInfo || !restInfo.categories) {
+    console.log(`Initial data fetch missing categories for ${restname}, performing fresh fetch...`);
+    restInfo = await getFreshData(restname);
+  }
+  
+  if (!restInfo || !restInfo.categories) {
+    return null;
+  }
+  
+  const processedMenu = restInfo.items.map(item => ({ 
+    ...item, 
+    _id: item._id.toString() 
+  }));
+  
+  return {
+    ...restInfo,
+    items: processedMenu
+  };
+}
 
 export async function generateStaticParams() {
-  const restnames = await getRestaurantsNames();
-  return restnames.map((restname) => ({
-    restname: restname.toString(),
-  }));
+  "use server";
+  try {
+    const restnames = await getRestaurantsNames();
+    return restnames.map((restname) => ({
+      restname: restname.toString(),
+    }));
+  } catch (error) {
+    console.error("Failed to generate static params:", error);
+    return []; 
+  }
 }
 
 export async function generateMetadata({ params }) {
+  "use server";
   const restname = (await params).restname;
   return {
     title: `${restname}'s Menu`,
     description: `View ${restname}'s restaurant menu items`,
+    openGraph: {
+      title: `${restname}'s Menu`,
+      description: `Browse ${restname}'s restaurant menu items`,
+      type: 'website',
+    },
   };
 }
 
 export async function revalidateMenuAction(restname) {
   "use server";
-
   revalidatePath(`/${restname}`);
   console.log(`Cache revalidated for restaurant: ${restname}`);
   return { success: true };
 }
 
-
 export default async function Menu({ params, searchParams }) {
   const restname = (await params).restname;
-  const lang = (await searchParams).lang || 'heb';
+  const lang = searchParams?.lang || 'heb';
   const isRTL = lang === 'heb';
-
-
   const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
+  
   try {
-    let restInfo = await getCachedRestInfo(restname);
+    const restInfo = await fetchRestaurantData(restname);
     
-    if (!restInfo || !restInfo.categories) {
-      console.log(`Initial data fetch missing categories for ${restname}, retrying...`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      restInfo = await getRestInfo(restname);
+    if (!restInfo) {
+      throw new Error(`Failed to get valid restaurant data for ${restname}`);
     }
     
-    if (!restInfo || !restInfo.categories) {
-      throw new Error(`Failed to get valid restaurant data for ${restname} after retry`);
-    }
-
-    const { categories: CATEGORIES, theme, header, description, items, footerText, socialLinks } = restInfo;
-    const menu = items.map(item => ({ ...item, _id: item._id.toString() }));
-
+    const { 
+      categories: CATEGORIES, 
+      theme, 
+      header, 
+      description, 
+      items: menu, 
+      footerText, 
+      socialLinks 
+    } = restInfo;
+    
     return (
       <Def
         CATEGORIES={CATEGORIES}
@@ -75,8 +129,7 @@ export default async function Menu({ params, searchParams }) {
     );
   } catch (error) {
     console.error(`Error rendering menu for ${restname}:`, error);
-
-
+    
     return (
       <div className="max-w-4xl mx-auto p-8" dir={isRTL ? 'rtl' : 'ltr'}>
         <h1 className="text-2xl font-bold text-red-600">
@@ -86,22 +139,12 @@ export default async function Menu({ params, searchParams }) {
           {isRTL ? 'לא ניתן לטעון את פריטי התפריט. אנא נסו שוב מאוחר יותר.' : 'Unable to load menu items. Please try again later.'}
         </p>
         <div className="mt-4 text-center">
-          {typeof theme !== 'undefined' && theme ?
-            <ErrorRetryButton
-              restname={restname}
-              isRTL={isRTL}
-              revalidateAction={revalidateMenuAction}
-              theme={theme}
-            />
-            :
-            <ErrorRetryButton
-              restname={restname}
-              isRTL={isRTL}
-              revalidateAction={revalidateMenuAction}
-            />
-          }
-
-
+          <ErrorRetryButton
+            restname={restname}
+            isRTL={isRTL}
+            revalidateAction={revalidateMenuAction}
+            theme={null}
+          />
         </div>
       </div>
     );

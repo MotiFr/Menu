@@ -8,7 +8,7 @@ const getCachedRestInfo = unstable_cache(
   async (restname) => {
     return await getRestInfo(restname);
   },
-  ['rest-info'],
+  ['rest-info', restname],
   { revalidate: 3600 }
 );
 
@@ -48,8 +48,8 @@ export default async function Menu({ params, searchParams }) {
     
     if (!restInfo || !restInfo.categories) {
       console.log(`Initial data fetch missing categories for ${restname}, retrying...`);
-      await new Promise(resolve => setTimeout(resolve, 300));
-      restInfo = await getCachedRestInfo(restname);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      restInfo = await getRestInfo(restname);
     }
     
     if (!restInfo || !restInfo.categories) {
@@ -58,7 +58,7 @@ export default async function Menu({ params, searchParams }) {
 
     const { categories: CATEGORIES, theme, header, description, items, footerText, socialLinks } = restInfo;
     const menu = items.map(item => ({ ...item, _id: item._id.toString() }));
-    
+
     return (
       <Def
         CATEGORIES={CATEGORIES}

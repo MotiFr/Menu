@@ -1,7 +1,7 @@
 "use client"
 import DeleteDialog from "@/components/App/DeleteDialog";
 import EditMenuDialog from "@/components/App/EditMenuDialog";
-import { ArrowDown, ArrowUp, Eye, EyeOff, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Eye, EyeOff, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CategoryDropDown, handleDown, handleUp, SkeletonEditMenu } from "./functions";
@@ -14,10 +14,10 @@ export default function EditMenuPageClient() {
 
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
-  
+
   useEffect(() => {
     const langParam = searchParams.get('lang');
-    
+
     if (langParam && (langParam === 'eng' || langParam === 'heb')) {
       setCurrentLang(langParam);
     } else {
@@ -130,8 +130,8 @@ export default function EditMenuPageClient() {
   if (loading) {
     return (
       <SkeletonEditMenu
-      isRTL= {isRTL}
-        />
+        isRTL={isRTL}
+      />
     )
   }
 
@@ -204,7 +204,7 @@ export default function EditMenuPageClient() {
       selectedAllergens = enteredAllergens.split(',').map(item => item.trim()).filter(item => item !== '');
       for (let allergen of selectedAllergens) {
         if (allergen.length > 30) {
-          setSubmission(<span className="text-red-600">{getLocalizedValue(`${allergen} is too long. Each should be 30 characters or fewer and separated by comma` , `${allergen} ארוך מדי צריך להיות פחות מ30 תווים כל אחד ומופרדים על ידי פסיק`)}</span>);
+          setSubmission(<span className="text-red-600">{getLocalizedValue(`${allergen} is too long. Each should be 30 characters or fewer and separated by comma`, `${allergen} ארוך מדי צריך להיות פחות מ30 תווים כל אחד ומופרדים על ידי פסיק`)}</span>);
           return;
         }
       }
@@ -224,10 +224,10 @@ export default function EditMenuPageClient() {
     }
 
     else if (enteredPrice === "") {
-      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a price" , "בבקשה הכנס מחיר")}</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter a price", "בבקשה הכנס מחיר")}</span>);
     }
     else if (/[^0-9./\s]/.test(enteredPrice)) {
-      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter number for price" , "הכנס מספר במחיר")}</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Please enter number for price", "הכנס מספר במחיר")}</span>);
     }
 
     else if (enteredCategory === "") {
@@ -240,7 +240,7 @@ export default function EditMenuPageClient() {
       setSubmission(<span className="text-red-600">{getLocalizedValue("Item description is too long", "תיאור ארוך מדי")}</span>);
     }
     else if (enteredPrice.length > 50) {
-      setSubmission(<span className="text-red-600">{getLocalizedValue("Price is too long" , "מחיר ארוך מדי")}</span>);
+      setSubmission(<span className="text-red-600">{getLocalizedValue("Price is too long", "מחיר ארוך מדי")}</span>);
     }
     else if (enteredAllergens.length > 500) {
       setSubmission(<span className="text-red-600">{getLocalizedValue("Additional comments are too long", "הערות נוספות יותר מדי ארוך")}</span>);
@@ -298,7 +298,7 @@ export default function EditMenuPageClient() {
 
 
         if (response.ok) {
-          setSubmission(<span className="text-green-600">{getLocalizedValue("Successfully added an item" , "פריט נוסף בהצלחה")}</span>);
+          setSubmission(<span className="text-green-600">{getLocalizedValue("Successfully added an item", "פריט נוסף בהצלחה")}</span>);
           setEnteredName("")
           setEnteredPrice("")
           setEnteredCategory("")
@@ -328,7 +328,7 @@ export default function EditMenuPageClient() {
   }
 
   return (
-    
+
     <div className="max-w-4xl mx-auto" dir={isRTL ? "rtl" : ""}>
       <div className="bg-white dark:bg-gray-800 shadow-sm p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{getLocalizedValue("Edit Menu", "ערוך תפריט")}</h1>
@@ -341,7 +341,7 @@ export default function EditMenuPageClient() {
             onClick={() => setIsItemVisible(!isItemVisible)}
             className={`${loading ? `cursor-not-allowed` : ``} w-full mb-4 px-6 py-3 text-l font-medium text-white bg-primary dark:bg-primary-dark rounded-lg shadow-lg hover:bg-primary-hover dark:hover:bg-primary-hover-dark transition-colors duration-200`}
           >
-            {getLocalizedValue("Add Item" , "הוסף פריט")}
+            {getLocalizedValue("Add Item", "הוסף פריט")}
           </button>
 
           {isItemVisible && (
@@ -354,7 +354,7 @@ export default function EditMenuPageClient() {
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                   <div className="relative">
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                     {getLocalizedValue("Item Name" , "שם הפריט")}
+                      {getLocalizedValue("Item Name", "שם הפריט")}
                     </label>
                     <input
                       type="text"
@@ -400,7 +400,7 @@ export default function EditMenuPageClient() {
                   </div>
                   {CATEGORIES.length === 0 && (<div>
                     <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                  {getLocalizedValue("No categories added yet. Start by adding your first category below.", "עדיין אין קטגוריות התחל בלהוסיף אחת למטה")}
+                      {getLocalizedValue("No categories added yet. Start by adding your first category below.", "עדיין אין קטגוריות התחל בלהוסיף אחת למטה")}
                     </p>
                   </div>)}
 
@@ -417,7 +417,7 @@ export default function EditMenuPageClient() {
                     />
 
                     <label htmlFor="file" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-2">
-                      {getLocalizedValue("Upload Image (optional)" , "העלאת תמונה כקובץ (לא חובה)")}
+                      {getLocalizedValue("Upload Image (optional)", "העלאת תמונה כקובץ (לא חובה)")}
                     </label>
                     <input
                       ref={fileInputRef}
@@ -433,7 +433,7 @@ export default function EditMenuPageClient() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {getLocalizedValue("Description (optional)" , "תיאור (לא חובה)")}
+                      {getLocalizedValue("Description (optional)", "תיאור (לא חובה)")}
                     </label>
                     <textarea
                       id="description"
@@ -537,16 +537,24 @@ export default function EditMenuPageClient() {
               CATEGORIES.map((category, indexer) => {
                 const Citems = items.filter((item) => item.category === category.name);
                 return (
-                  <div key={category.name}>
-                    <CategoryDropDown
-                      setRefresh={setRefresh}
-                      category={category}
-                      indexer={indexer}
-                      CATEGORIES={CATEGORIES}
-                      getLocalizedValue={getLocalizedValue}
-                      isRTL={isRTL}
-                    />
-                    <div className="text-l text-gray-900 dark:text-white mb-4">{getLocalizedValue(category.description_eng, category.description_heb)}</div>
+                  <details key={category.name}
+                  className="backdrop-blur p-2 group bg-slate-200 dark:bg-gray-700 rounded-lg shadow-md transition-colors duration-200"
+                  >
+                    <summary className="justify-between items-center cursor-pointer list-none select-none">
+                      <span className={`${isRTL ? 'right-0 group-open:-rotate-90' : 'left-0 group-open:rotate-90'} absolute top-2 text-xl transform transition-transform duration-300 `}>
+                        {!isRTL ? <ChevronRight /> : <ChevronLeft />}
+                      </span>
+                      <CategoryDropDown
+                        setRefresh={setRefresh}
+                        category={category}
+                        indexer={indexer}
+                        CATEGORIES={CATEGORIES}
+                        getLocalizedValue={getLocalizedValue}
+                        isRTL={isRTL}
+                      />
+
+                      <div className="text-l text-gray-900 dark:text-white pb-4">{getLocalizedValue(category.description_eng, category.description_heb)}</div>
+                    </summary>
                     <div className="grid grid-cols-1 gap-4">
                       {Citems.map((item, index) => (
                         <div
@@ -612,7 +620,7 @@ export default function EditMenuPageClient() {
                                 width={150}
                                 height={150}
                                 className={`w-20 h-20 object-cover rounded-lg ${isRTL ? `order-last` : ``}`}
-                                
+
                               />
                             )}
                             <div className="flex-1">
@@ -620,10 +628,10 @@ export default function EditMenuPageClient() {
                                 {getLocalizedValue(item.name_eng, item.name_heb)}
                               </h3>
                               <p className={item.seen ? `mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 max-w-64` : `mt-1 text-sm text-gray-400 dark:text-gray-400 line-clamp-1 max-w-64`}>
-                              {getLocalizedValue(item.description_eng, item.description_heb)}
+                                {getLocalizedValue(item.description_eng, item.description_heb)}
                               </p>
                               <div className={item.url ? getLocalizedValue("absolute bottom-2 right-12", "absolute bottom-2 left-32") : getLocalizedValue("absolute bottom-3 right-12", "absolute bottom-3 left-10")}>
-                              <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
+                                <p className="text-right mt-2 text-primary dark:text-primary-dark font-semibold">
                                   {item.price}
                                 </p>
                               </div>
@@ -638,7 +646,7 @@ export default function EditMenuPageClient() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </details>
                 );
               })
             ) : (

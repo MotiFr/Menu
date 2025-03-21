@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowDown, ArrowUp, Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import CategoryDialog from "@/components/App/CategoryDialog";
 import DeleteCatDialog from "@/components/App/DeleteCatDialog";
@@ -78,7 +78,7 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, ge
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white relative">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white relative pl-4 pr-4">
         {getLocalizedValue(category.name_eng, category.name_heb)}
         <span className={`${getLocalizedValue(`absolute right-0`, `absolute left-0`)}`}>
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
@@ -168,14 +168,14 @@ export function SkeletonEditMenu({ isRTL }) {
             <Skeleton className="h-4 w-96" />
           </div>
         </div>
-        
+
         <div className="pt-10"></div>
-        
+
         {/* Action buttons skeletons */}
         <div className="max-w-4xl mx-auto">
           <Skeleton className="w-full mb-4 h-12 rounded-lg" />
           <Skeleton className="w-full mb-4 h-12 rounded-lg" />
-          
+
           {/* Categories and items skeletons */}
           <div className="mt-8 space-y-8">
             {/* Repeat for 2 categories */}
@@ -186,14 +186,14 @@ export function SkeletonEditMenu({ isRTL }) {
                   <Skeleton className="h-6 w-1/4" />
                   <Skeleton className="h-6 w-8" />
                 </div>
-                
+
                 {/* Category description skeleton */}
                 <Skeleton className="h-4 w-2/3 mb-4" />
-                
+
                 {/* Items skeletons - 3 items per category */}
                 <div className="grid grid-cols-1 gap-4">
                   {[1, 2, 3].map((item) => (
-                    <div 
+                    <div
                       key={item}
                       className="relative bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4"
                     >
@@ -202,18 +202,17 @@ export function SkeletonEditMenu({ isRTL }) {
                         <div className={`${isRTL ? "order-last" : ""}`}>
                           <Skeleton className="w-20 h-20 rounded-lg" />
                         </div>
-                        
+
                         <div className="flex-1">
                           {/* Item name skeleton */}
                           <Skeleton className="h-5 w-1/2 mb-2" />
-                          
+
                           {/* Item description skeleton */}
                           <Skeleton className="h-4 w-3/4" />
-                          
+
                           {/* Item price skeleton */}
-                          <div className={`absolute ${
-                            isRTL ? "left-32 bottom-2" : "right-12 bottom-2"
-                          }`}>
+                          <div className={`absolute ${isRTL ? "left-32 bottom-2" : "right-12 bottom-2"
+                            }`}>
                             <Skeleton className="h-4 w-16" />
                           </div>
                         </div>

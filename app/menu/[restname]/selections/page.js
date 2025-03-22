@@ -2,7 +2,7 @@ import SelectionPage from "@/components/Menu/selectionPage";
 import { getRestaurantsNames, getTheme } from "@/server/dbMenu";
 import { unstable_cache } from 'next/cache';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const revalidate = 3600; 
 
 
@@ -45,10 +45,8 @@ export async function generateMetadata({ params }) {
     };
 }
 
-export default async function Selections({ params, searchParams }) {
+export default async function Selections({ params }) {
     const restname = (await params).restname
-    const lang = (await searchParams).lang || "heb";
-    const isRTL = lang === 'heb';
 
 
     try {
@@ -57,8 +55,6 @@ export default async function Selections({ params, searchParams }) {
         return (
             <>
                 <SelectionPage
-                    lang={lang}
-                    isRTL={isRTL}
                     theme={themeData.theme}
                 />
             </>

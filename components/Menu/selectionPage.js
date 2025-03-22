@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import ThemedBackground from "@/components/Menu/ThemeBG";
 import { menuItemClasses, dialogClasses, priceClasses } from "./Themes";
 
-export default function SelectionPage({ theme = "default", lang, isRTL }) {
+export default function SelectionPage({ theme = "default" }) {
+    const searchParams = useSearchParams();
     const pathname = usePathname();
     const restaurantId = pathname.split('/')[2];
     const storageKey = `selections-${restaurantId}`;
@@ -22,6 +23,16 @@ export default function SelectionPage({ theme = "default", lang, isRTL }) {
     const [selections, setSelections] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [lang, setLang] = useState('heb');
+    const isRTL = lang === 'heb';
+
+
+    useEffect(() => {
+        const langParam = searchParams.get('lang');
+        if (langParam) {
+          setLang(langParam);
+        }
+      }, [searchParams]);
 
     const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
 
@@ -94,7 +105,7 @@ export default function SelectionPage({ theme = "default", lang, isRTL }) {
                             onClick={() => openItemDialog(item)}
                         >
                             <CardContent className="relative p-0">
-                                <div className={`absolute top-2 right-2 ${menuItemClasses[theme]} text-sm font-semibold px-2 py-1 rounded-full shadow`}>
+                                <div className={`absolute top-1 right-1 ${menuItemClasses[theme]} text-sm font-semibold px-1 py-1 rounded-full shadow`}>
                                     {count > 1 && <span className="text-l">(x{count})</span>}
                                 </div>
                                 <div className="flex items-center p-3">
@@ -104,8 +115,11 @@ export default function SelectionPage({ theme = "default", lang, isRTL }) {
                                                 src={item.url}
                                                 alt={item.name}
                                                 fill
-                                                className="object-cover rounded-lg"
-                                            />
+                                                className="rounded-lg object-cover"
+                                                sizes="100px"
+                                                onError={(e) => {
+                                                    e.target.closest('.flex-shrink-0').style.display = 'none';
+                                                }} />
                                         </div>
                                     )}
                                     <div className="flex-1 ml-4 mr-6">
@@ -130,7 +144,7 @@ export default function SelectionPage({ theme = "default", lang, isRTL }) {
                                                     className="text-gray-400 hover:text-red-500 transition-colors duration-200"
                                                     aria-label="Remove item"
                                                 >
-                                                    <Trash2 className="absolute right-2 bottom-10 w-5 h-5 text-black dark:text-white hover:text-red-600" />
+                                                    <Trash2 className="absolute right-2 bottom-2 w-5 h-5 text-black dark:text-white hover:text-red-600" />
                                                 </button>
                                             </div>
                                         </div>
@@ -153,14 +167,16 @@ export default function SelectionPage({ theme = "default", lang, isRTL }) {
                             </DialogHeader>
 
                             {selectedItem.url && (
-                                <div className="mt-4 relative h-48 w-full">
+                                <div className="mt-4 relative h-72 w-full">
                                     <Image
                                         src={selectedItem.url}
                                         alt={selectedItem.name}
                                         fill
+                                        sizes="(max-width: 1200px) 40vw, 25vw"
                                         className="rounded-lg object-cover"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                        priority
+                                        onError={(e) => {
+                                            e.target.closest('.relative').style.display = 'none';
+                                        }}
                                     />
                                 </div>
                             )}

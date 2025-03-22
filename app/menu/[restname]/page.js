@@ -3,7 +3,7 @@ import { revalidatePath, unstable_cache } from 'next/cache';
 import ErrorRetryButton from "@/components/Menu/ReloadButton";
 import Def from "@/components/ViewMenu/Def";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const revalidate = 3600; 
 
 async function fetchRestaurantData(restname) {
@@ -90,11 +90,9 @@ export async function revalidateMenuAction(restname) {
   return { success: true };
 }
 
-export default async function Menu({ params, searchParams }) {
+export default async function Menu({ params }) {
   const restname = (await params).restname;
-  const lang = (await searchParams).lang || 'heb';
-  const isRTL = lang === 'heb';
-  const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
+
   
   try {
     const restInfo = await fetchRestaurantData(restname);
@@ -123,8 +121,6 @@ export default async function Menu({ params, searchParams }) {
         footerText={footerText}
         socialLinks={socialLinks}
         restname={restname}
-        isRTL={isRTL}
-        getLocalizedValue={getLocalizedValue}
       />
     );
   } catch (error) {

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 
-export default function ThemedBackground({ theme }) {
+export default function ThemedBackground({ theme, customBg }) {
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
@@ -144,10 +144,21 @@ export default function ThemedBackground({ theme }) {
         }
     };
 
+    // If custom background is provided, use it instead of theme patterns
+    const backgroundStyle = customBg 
+        ? {
+            backgroundImage: isDarkMode 
+                ? `linear-gradient(rgba(15, 15, 25, 0.75), rgba(5, 5, 15, 0.85)), url('${customBg}')`
+                : `linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url('${customBg}')`,
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed"
+        } 
+        : (isDarkMode ? patterns[theme]?.dark : patterns[theme]?.light);
+
     return (
         <div
             className="fixed inset-0 -z-10 transition-all duration-500"
-            style={isDarkMode ? patterns[theme]?.dark : patterns[theme]?.light}
+            style={backgroundStyle}
         />
     );
 }

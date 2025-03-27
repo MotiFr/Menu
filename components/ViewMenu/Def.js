@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 
 
 
-export default function Def({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname }) {
+export default function Def({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname, bg }) {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState('heb');
   const isRTL = lang === 'heb';
@@ -75,15 +75,15 @@ export default function Def({ CATEGORIES, theme, header, description, menu, foot
   return (
     <>
       <div className="min-h-screen transition-all duration-500" dir={isRTL ? 'rtl' : 'ltr'}>
-        <ThemedBackground theme={theme} />
+        <ThemedBackground theme={theme} customBg={bg} />
         
         <div className="max-w-7xl mx-auto px-2 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">
+            <h1 className="text-4xl font-bold mb-6">
               {getLocalizedValue(header.eng, header.heb)}
             </h1>
 
-            <p className="text-lg opacity-80">
+            <p className="text-lg opacity-80 pb-6">
               {getLocalizedValue(description.eng, description.heb)}
             </p>
           </div>

@@ -46,6 +46,7 @@ export default function EditMenuPageClient() {
   const [refresh, setRefresh] = useState(false);
   const [isItemVisible, setIsItemVisible] = useState(false);
   const [isCatVisible, setIsCatVisible] = useState(false);
+  const [showOnlyHidden, setShowOnlyHidden] = useState(false);
   const [enteredName, setEnteredName] = useState("");
   const [enteredPrice, setEnteredPrice] = useState("");
   const [enteredCategory, setEnteredCategory] = useState("");
@@ -533,9 +534,33 @@ export default function EditMenuPageClient() {
           )}
 
           <div className="mt-8 space-y-8">
+            <div className="flex justify-center mb-4">
+              <button
+                onClick={() => setShowOnlyHidden(!showOnlyHidden)}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-lg shadow-md transition-all duration-200 ${
+                  showOnlyHidden 
+                    ? 'bg-primary dark:bg-primary-dark text-white hover:bg-primary-hover dark:hover:bg-primary-hover-dark' 
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                }`}
+              >
+                {showOnlyHidden ? (
+                  <Eye className={`h-6 w-6 ${showOnlyHidden ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                ) : (
+                  <EyeOff className={`h-6 w-6 ${showOnlyHidden ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                )}
+                <span className="font-medium">
+                  {getLocalizedValue(
+                    showOnlyHidden ? "Show All Items" : "Show Only Hidden Items",
+                    showOnlyHidden ? "הצג את כל הפריטים" : "הצג רק פריטים מוסתרים"
+                  )}
+                </span>
+              </button>
+            </div>
             {CATEGORIES && CATEGORIES.length > 0 ? (
               CATEGORIES.map((category, indexer) => {
-                const Citems = items.filter((item) => item.category === category.name);
+                const Citems = items
+                  .filter((item) => item.category === category.name)
+                  .filter((item) => !showOnlyHidden || !item.seen);
                 return (
                   <details key={category.name}
                   className="backdrop-blur p-2 group bg-slate-200 dark:bg-gray-700 rounded-lg shadow-md transition-colors duration-200"

@@ -2,13 +2,14 @@ import { getRestaurantsNames, getRestInfo } from "@/server/dbMenu";
 import { revalidatePath, unstable_cache } from 'next/cache';
 import ErrorRetryButton from "@/components/Menu/ReloadButton";
 import Def from "@/components/ViewMenu/Def";
+import CategoryMenu from "@/components/ViewMenu/CategoryMenu";
 
 export const dynamic = 'force-static';
-export const revalidate = 3600; 
+export const revalidate = 3600;
 
 async function fetchRestaurantData(restname) {
   "use server";
-  
+
   const getCachedRestInfo = async (restname) => {
     return unstable_cache(
       async () => {
@@ -22,7 +23,7 @@ async function fetchRestaurantData(restname) {
       { revalidate: 3600 }
     )();
   };
-  
+
   const getFreshData = async (restname) => {
     console.log(`Performing fresh data fetch for ${restname}`);
     try {
@@ -33,23 +34,23 @@ async function fetchRestaurantData(restname) {
       throw error;
     }
   };
-  
+
   let restInfo = await getCachedRestInfo(restname);
-  
+
   if (!restInfo || !restInfo.categories) {
     console.log(`Initial data fetch missing categories for ${restname}, performing fresh fetch...`);
     restInfo = await getFreshData(restname);
   }
-  
+
   if (!restInfo || !restInfo.categories) {
     return null;
   }
-  
-  const processedMenu = restInfo.items.map(item => ({ 
-    ...item, 
-    _id: item._id.toString() 
+
+  const processedMenu = restInfo.items.map(item => ({
+    ...item,
+    _id: item._id.toString()
   }));
-  
+
   return {
     ...restInfo,
     items: processedMenu
@@ -65,7 +66,7 @@ export async function generateStaticParams() {
     }));
   } catch (error) {
     console.error("Failed to generate static params:", error);
-    return []; 
+    return [];
   }
 }
 
@@ -93,39 +94,60 @@ export async function revalidateMenuAction(restname) {
 export default async function Menu({ params }) {
   const restname = (await params).restname;
 
-  
+
   try {
     const restInfo = await fetchRestaurantData(restname);
-    
+
     if (!restInfo) {
       throw new Error(`Failed to get valid restaurant data for ${restname}`);
     }
-    
-    const { 
-      categories: CATEGORIES, 
-      theme, 
-      header, 
-      description, 
-      items: menu, 
-      footerText, 
-      socialLinks 
+
+    const {
+      categories: CATEGORIES,
+      theme,
+      header,
+      description,
+      items,
+      footerText,
+      socialLinks,
+      menu,
+      bg
     } = restInfo;
-    
-    return (
-      <Def
+
+    if (menu === 'CategoryMenu') {
+      return (
+        <CategoryMenu
         CATEGORIES={CATEGORIES}
         theme={theme}
         header={header}
         description={description}
-        menu={menu}
+        menu={items}
+        bg={bg}
         footerText={footerText}
         socialLinks={socialLinks}
         restname={restname}
       />
-    );
+      )
+
+    } else {
+      return (
+        <Def
+        CATEGORIES={CATEGORIES}
+        theme={theme}
+        bg={bg}
+        header={header}
+        description={description}
+        menu={items}
+        footerText={footerText}
+        socialLinks={socialLinks}
+        restname={restname}
+      />
+      )
+    }
+
   } catch (error) {
     console.error(`Error rendering menu for ${restname}:`, error);
-    
+
     return (
       <div className="max-w-4xl mx-auto p-8" dir={isRTL ? 'rtl' : 'ltr'}>
         <h1 className="text-2xl font-bold text-red-600">

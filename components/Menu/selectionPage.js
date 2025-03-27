@@ -113,7 +113,7 @@ export default function SelectionPage({ theme = "default" }) {
                                         <div className={`relative w-20 h-20 flex-shrink-0 ${isRTL ? 'order-last' : ''}`}>
                                             <Image
                                                 src={item.url}
-                                                alt={item.name}
+                                                alt={item.name_eng}
                                                 fill
                                                 className="rounded-lg object-cover"
                                                 sizes="100px"
@@ -132,9 +132,9 @@ export default function SelectionPage({ theme = "default" }) {
                                                     {getLocalizedValue(item.description_eng, item.description_heb)}
                                                 </p>
                                             </div>
-                                            <div className="flex items-center space-x-4">
+                                            <div className="flex items-center">
                                                 <p className={`text-lg font-semibold ${priceClasses[theme]}`}>
-                                                    {item.price}
+                                                ₪{item.price}
                                                 </p>
                                                 <button
                                                     onClick={(e) => {
@@ -157,20 +157,20 @@ export default function SelectionPage({ theme = "default" }) {
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(false)}>
-                <DialogContent className={`max-w-[26rem] ${dialogClasses[theme]}`}>
+                <DialogContent className={`max-w-[26rem] max-h-[90vh] ${dialogClasses[theme]}`}>
                     {selectedItem && (
                         <>
-                            <DialogHeader>
-                                <DialogTitle className={priceClasses[theme]}>
+                            <DialogHeader className="pb-2">
+                                <DialogTitle className={`text-xl ${priceClasses[theme]}`}>
                                     {getLocalizedValue(selectedItem.name_eng, selectedItem.name_heb)}
                                 </DialogTitle>
                             </DialogHeader>
 
                             {selectedItem.url && (
-                                <div className="mt-4 relative h-72 w-full">
+                                <div className="relative h-64 w-full">
                                     <Image
                                         src={selectedItem.url}
-                                        alt={selectedItem.name}
+                                        alt={selectedItem.name_eng}
                                         fill
                                         sizes="(max-width: 1200px) 40vw, 25vw"
                                         className="rounded-lg object-cover"
@@ -181,15 +181,15 @@ export default function SelectionPage({ theme = "default" }) {
                                 </div>
                             )}
 
-                            <div className="mt-4 max-h-48 overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+                            <div className="mt-2 max-h-40 overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'}>
                                 <p className="text-sm text-muted-foreground">
                                     {getLocalizedValue(selectedItem.description_eng, selectedItem.description_heb)}
                                 </p>
                             </div>
 
                             {selectedItem.allergens?.length > 0 && (
-                                <div className="mt-4 space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="mt-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                                    <div className="flex flex-wrap gap-1.5">
                                         {selectedItem.allergens.map((allergen) => (
                                             <Badge
                                                 key={allergen.eng}
@@ -203,9 +203,9 @@ export default function SelectionPage({ theme = "default" }) {
                                 </div>
                             )}
 
-                            <div className="mt-6" dir={isRTL ? 'ltr' : 'rtl'}>
+                            <div className="mt-3" dir={isRTL ? 'ltr' : 'rtl'}>
                                 <p className={`text-xl font-bold ${priceClasses[theme]}`}>
-                                    {selectedItem.price}
+                                ₪{selectedItem.price}
                                 </p>
                             </div>
                         </>

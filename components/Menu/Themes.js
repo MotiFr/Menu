@@ -95,29 +95,29 @@ export const themes = {
 };
 
 export const categoryClasses = {
-    forest: 'bg-[#4A5940]/10 dark:bg-[#4A5940]/20 border-[#4A5940]/20 dark:border-[#8EB48F]/20',
-    sea: 'bg-[#0F1A4D]/10 dark:bg-[#0F1A4D]/20 border-[#0F1A4D]/20 dark:border-[#7BA6F0]/20',
-    dust: 'bg-[#403A35]/10 dark:bg-[#403A35]/20 border-[#403A35]/20 dark:border-[#BCB8B1]/20',
-    violet: 'bg-[#7A1CAF]/10 dark:bg-[#7A1CAF]/20 border-[#7A1CAF]/20 dark:border-[#B12075]/20',
-    darkWood: 'bg-[#202030]/10 dark:bg-[#202030]/20 border-[#202030]/20 dark:border-[#756C5F]/20',
-    sky: 'bg-[#174769]/10 dark:bg-[#174769]/20 border-[#174769]/20 dark:border-[#8FB8ED]/20',
-    terracotta: 'bg-[#993D20]/10 dark:bg-[#993D20]/20 border-[#993D20]/20 dark:border-[#E6C9A8]/20',
-    mint: 'bg-[#0E8A6E]/10 dark:bg-[#0E8A6E]/20 border-[#0E8A6E]/20 dark:border-[#B7E4C7]/20',
-    berry: 'bg-[#4A1942]/10 dark:bg-[#4A1942]/20 border-[#4A1942]/20 dark:border-[#C85C8E]/20',
-    default: 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+    forest: 'bg-[#4A5940]/20 dark:bg-[#4A5940]/20 border-[#4A5940]/20 dark:border-[#8EB48F]/90 backdrop-blur-sm',
+    sea: 'bg-[#0F1A4D]/20 dark:bg-[#0F1A4D]/20 border-[#0F1A4D]/20 dark:border-[#7BA6F0]/90 backdrop-blur-sm',
+    dust: 'bg-[#403A35]/20 dark:bg-[#403A35]/20 border-[#403A35]/20 dark:border-[#BCB8B1]/90 backdrop-blur-sm',
+    violet: 'bg-[#7A1CAF]/20 dark:bg-[#7A1CAF]/20 border-[#7A1CAF]/20 dark:border-[#B12075]/90 backdrop-blur-sm',
+    darkWood: 'bg-[#202030]/20 dark:bg-[#202030]/20 border-[#202030]/20 dark:border-[#756C5F]/90 backdrop-blur-sm',
+    sky: 'bg-[#174769]/20 dark:bg-[#174769]/20 border-[#174769]/20 dark:border-[#8FB8ED]/90 backdrop-blur-sm',
+    terracotta: 'bg-[#993D20]/20 dark:bg-[#993D20]/20 border-[#993D20]/20 dark:border-[#E6C9A8]/90 backdrop-blur-sm',
+    mint: 'bg-[#0E8A6E]/20 dark:bg-[#0E8A6E]/20 border-[#0E8A6E]/20 dark:border-[#B7E4C7]/90 backdrop-blur-sm',
+    berry: 'bg-[#4A1942]/20 dark:bg-[#4A1942]/20 border-[#4A1942]/20 dark:border-[#C85C8E]/90 backdrop-blur-sm',
+    default: 'bg-gray-50/20 dark:bg-gray-800/20 border-gray-200/20 dark:border-gray-800/90 backdrop-blur-sm'
 };
 
 export const menuItemClasses = {
-    forest: 'bg-[#8EB48F]/20 hover:bg-[#8EB48F]/30 dark:bg-[#4A5940]/30 dark:hover:bg-[#4A5940]/40',
-    sea: 'bg-[#3878C4]/20 hover:bg-[#3878C4]/30 dark:bg-[#0F1A4D]/30 dark:hover:bg-[#0F1A4D]/40',
-    dust: 'bg-[#8A817C]/20 hover:bg-[#8A817C]/30 dark:bg-[#403A35]/30 dark:hover:bg-[#403A35]/40',
-    violet: 'bg-[#B12075]/20 hover:bg-[#B12075]/30 dark:bg-[#7A1CAF]/30 dark:hover:bg-[#7A1CAF]/40',
-    darkWood: 'bg-[#39304A]/20 hover:bg-[#39304A]/30 dark:bg-[#202030]/30 dark:hover:bg-[#202030]/40',
-    sky: 'bg-[#2B5778]/20 hover:bg-[#2B5778]/30 dark:bg-[#174769]/30 dark:hover:bg-[#174769]/40',
-    terracotta: 'bg-[#D2691E]/20 hover:bg-[#D2691E]/30 dark:bg-[#993D20]/30 dark:hover:bg-[#993D20]/40',
-    mint: 'bg-[#52B788]/20 hover:bg-[#52B788]/30 dark:bg-[#0E8A6E]/30 dark:hover:bg-[#0E8A6E]/40',
-    berry: 'bg-[#7B2869]/20 hover:bg-[#7B2869]/30 dark:bg-[#4A1942]/30 dark:hover:bg-[#4A1942]/40',
-    default: 'bg-white/80 hover:bg-gray-50 dark:bg-gray-900/80 dark:hover:bg-gray-800/80'
+    forest: 'bg-[#8EB48F]/20 dark:bg-[#4A5940]/80',
+    sea: 'bg-[#3878C4]/20 dark:bg-[#0F1A4D]/80',
+    dust: 'bg-[#8A817C]/20 dark:bg-[#403A35]/80',
+    violet: 'bg-[#B12075]/20 dark:bg-[#7A1CAF]/80',
+    darkWood: 'bg-[#39304A]/20 dark:bg-[#202030]/80',
+    sky: 'bg-[#2B5778]/20 dark:bg-[#174769]/80',
+    terracotta: 'bg-[#D2691E]/20 dark:bg-[#993D20]/80',
+    mint: 'bg-[#52B788]/20 dark:bg-[#0E8A6E]/80',
+    berry: 'bg-[#7B2869]/20 dark:bg-[#4A1942]/80',
+    default: 'bg-white/60 dark:bg-gray-900/80'
 };
 
 export const dialogClasses = {

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import Image from 'next/image';
 
-const LanguageSelector = ({ defaultLang = 'eng' }) => {
+const LanguageSelector = ({ defaultLang = 'heb' }) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();

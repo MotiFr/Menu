@@ -27,37 +27,34 @@ export default function MenuItemDialog({ theme = 'default', item, isOpen, onClos
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-[26rem] ${dialogClasses[theme]}`} dir={isRTL ? 'rtl' : 'ltr'}>
-        <DialogHeader>
+      <DialogContent className={`max-w-[26rem] max-h-[90vh] flex flex-col ${dialogClasses[theme]}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <DialogHeader className="flex-none">
           <DialogTitle className={priceClasses[theme]}>{item.name}</DialogTitle>
         </DialogHeader>
 
         {item.url && (
-          <div className="mt-4 relative h-72">
-          <Image
-            src={item.url}
-            alt={item.name}
-            fill
-            sizes="(max-width: 1200px) 40vw, 25vw"
-            className="rounded-lg object-cover"
-            onError={(e) => {
-              e.target.closest('.relative').style.display = 'none';
-            }}
-          />
-        </div>
-        
-        
+          <div className="mt-4 relative h-48 flex-none">
+            <Image
+              src={item.url}
+              alt={item.name}
+              fill
+              sizes="(max-width: 1200px) 40vw, 25vw"
+              className="rounded-lg object-cover"
+              onError={(e) => {
+                e.target.closest('.relative').style.display = 'none';
+              }}
+            />
+          </div>
         )}
-        
 
-        <div className="mt-4 max-h-48 overflow-y-auto">
+        <div className="mt-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
           <p className={`text-sm ${theme === 'default' ? 'text-gray-600 dark:text-gray-300' : 'text-black/70 dark:text-white/70'}`}>
             {item.description}
           </p>
         </div>
 
         {item.allergens?.length > 0 && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-2 flex-none">
             <div className="flex flex-wrap gap-2">
               {item.allergens.map((allergen) => (
                 <Badge
@@ -72,9 +69,9 @@ export default function MenuItemDialog({ theme = 'default', item, isOpen, onClos
           </div>
         )}
 
-        <div className={`mt-6 ${isRTL ? 'text-left' : 'text-right'}`}>
+        <div className={`mt-6 flex-none ${isRTL ? 'text-left' : 'text-right'}`}>
           <p className={`text-xl font-bold ${priceClasses[theme]}`}>
-            {item.price}
+            ₪{item.price}
           </p>
           <button
             className={`w-full mt-4 px-6 py-3 text-l font-medium text-white rounded-lg shadow-lg transition-colors duration-200 ${buttonClasses[theme]}`}

@@ -1,9 +1,10 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Ellipsis, Pencil, Trash2, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import CategoryDialog from "@/components/App/CategoryDialog";
 import DeleteCatDialog from "@/components/App/DeleteCatDialog";
+import CategoryImageDialog from "@/components/App/CategoryImageDialog";
 
 
 export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, getLocalizedValue, isRTL }) {
@@ -14,6 +15,7 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, ge
   const [loadingPosition, setLoadingPosition] = useState(false);
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
 
 
@@ -25,6 +27,11 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, ge
 
   const handleDeleteCat = () => {
     setIsDeleting(true);
+    setIsDropdownOpen(false);
+  }
+
+  const handleImageCat = () => {
+    setIsImageDialogOpen(true);
     setIsDropdownOpen(false);
   }
 
@@ -95,6 +102,15 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, ge
                   <span>{getLocalizedValue("Edit Category", "ערוך קטגוריה")}</span>
                 </div>
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={handleImageCat}
+                className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <div className="flex items-center space-x-2">
+                  <ImageIcon className="h-4 w-4" />
+                  <span>{getLocalizedValue("Manage Image", "נהל תמונה")}</span>
+                </div>
+              </DropdownMenuItem>
               {indexer > 0 && !loadingPosition && (
                 <DropdownMenuItem
                   onSelect={handleUp}
@@ -147,6 +163,15 @@ export function CategoryDropDown({ setRefresh, category, indexer, CATEGORIES, ge
         category={selectedCategory}
         isOpen={isDeleting}
         onClose={() => setIsDeleting(false)}
+        getLocalizedValue={getLocalizedValue}
+        isRTL={isRTL}
+      />
+
+      <CategoryImageDialog
+        setRefresh={setRefresh}
+        category={selectedCategory}
+        isOpen={isImageDialogOpen}
+        onClose={() => setIsImageDialogOpen(false)}
         getLocalizedValue={getLocalizedValue}
         isRTL={isRTL}
       />

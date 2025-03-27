@@ -279,8 +279,8 @@ export async function getCategories() {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        const result = await db.collection(`${restname} Data`).findOne({ categories: { $exists: true } }, { projection: { categories: 1, _id: 0 } });
-        return result;
+        const { categories, menu, bg} = await db.collection(`${restname} Data`).findOne({ categories: { $exists: true } });
+        return { categories, menu, bg };
     } catch (error) {
         console.error('Error getting categories:', error);
         throw error;
@@ -516,6 +516,36 @@ export async function updateCategory(changedCategory, categoryName, isRTL) {
 
     } catch (error) {
         console.error('Error updating item:', error);
+        throw error;
+    }
+}
+
+
+export async function updateCategoryImage(_id, url, name) {
+    try {
+        const restname = await getRestaurant();
+        const client = await getMongoClient();
+        const db = client.db("restaurant");
+
+        await db.collection(`${restname} Data`).updateOne(
+            { "categories._id": _id },
+            {
+                    $set: {
+                        "categories.$[elem].url": url,
+                    }
+                },
+                {
+                arrayFilters: [{ "elem.name": name }]
+            }
+        );
+
+        revalidatePath(`/menu/${restname}`)
+        revalidatePath(`/menu/${restname}/selections`)
+
+
+
+    } catch (error) {
+        console.error('Error updating category image:', error);
         throw error;
     }
 }

@@ -155,8 +155,8 @@ const Footer = ({ currentLang, currentTheme, t, footer }) => {
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col md:flex-row justify-between items-center">
-                    <div className="mb-4 md:mb-0 text-center">
+                <div className="flex flex-col justify-between items-center">
+                    <div className="mb-4 text-center">
                         {(footerText[currentLang] || (!hasSocialLinks && (currentLang === 'heb' ? 'לחץ על ״ערוך״ כדי להוסיף תחתית' : 'Click "Edit" to add footer text'))) && (
                             <p dir={currentLang === 'heb' ? 'rtl' : 'ltr'} className="opacity-80 text-lg">
                                 {footerText[currentLang] || (!hasSocialLinks && (currentLang === 'heb' ? 'לחץ על ״ערוך״ כדי להוסיף תחתית' : 'Click "Edit" to add footer text'))}
@@ -164,7 +164,7 @@ const Footer = ({ currentLang, currentTheme, t, footer }) => {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col space-y-3 mb-4">
                         {socialLinks.instagram && renderSocialButton('instagram', Instagram)}
                         {socialLinks.facebook && renderSocialButton('facebook', Facebook)}
                         {socialLinks.twitter && renderSocialButton('twitter', Twitter)}

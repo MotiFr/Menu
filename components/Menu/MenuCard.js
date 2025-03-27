@@ -45,7 +45,7 @@ export default function MenuCard({ items, theme = 'default', isRTL = false }) {
                   <h3 className={`text-lg font-semibold truncate ${isRTL ? 'pl-4' : 'pr-4'}`}>
                     {item.name}
                   </h3>
-                  <span className="text-lg font-bold whitespace-nowrap ml-4">{item.price}</span>
+                  <span className="text-lg font-bold whitespace-nowrap ml-4">₪{item.price}</span>
                 </div>
                 <p className="opacity-80 line-clamp-1 text-sm">{item.description}</p>
               </div>

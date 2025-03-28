@@ -109,7 +109,7 @@ const LanguageSelectorMenu = ({ defaultLang = 'heb', restname }) => {
 
     return (
         <Select value={currentLang} onValueChange={handleValueChange} disabled={isLoading}>
-            <SelectTrigger className="w-[100px]">
+            <SelectTrigger className="w-[100px]" aria-label="Language Selector">
                 <SelectValue placeholder={currentLang === 'heb' ? 'HEB' : 'ENG'} />
             </SelectTrigger>
             <SelectContent>

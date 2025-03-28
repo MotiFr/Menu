@@ -15,8 +15,8 @@ export async function GET() {
         const categories = categoriesOb.categories;
         const menu = categoriesOb.menu;
         const bg = categoriesOb.bg;
-        const {footerText, socialLinks} = footer
-        return NextResponse.json({ theme, items, header, description, categories, menu, bg, footerText, socialLinks });
+        const {footerText, socialLinks, message} = footer
+        return NextResponse.json({ theme, items, header, description, categories, menu, bg, footerText, socialLinks, message });
     } catch (error) {
         return NextResponse.json(
             { message: "Failed to fetch items", error: error.message },

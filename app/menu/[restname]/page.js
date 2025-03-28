@@ -111,12 +111,13 @@ export default async function Menu({ params }) {
       footerText,
       socialLinks,
       menu,
-      bg
+      bg,
+      message
     } = restInfo;
-
     if (menu === 'CategoryMenu') {
       return (
         <CategoryMenu
+        message={message}
         CATEGORIES={CATEGORIES}
         theme={theme}
         header={header}
@@ -132,6 +133,7 @@ export default async function Menu({ params }) {
     } else {
       return (
         <Def
+        message={message}
         CATEGORIES={CATEGORIES}
         theme={theme}
         bg={bg}

@@ -279,8 +279,8 @@ export async function getCategories() {
         const restname = await getRestaurant();
         const client = await getMongoClient();
         const db = client.db("restaurant");
-        const { categories, menu, bg} = await db.collection(`${restname} Data`).findOne({ categories: { $exists: true } });
-        return { categories, menu, bg };
+        const { categories, menu, bg, message} = await db.collection(`${restname} Data`).findOne({ categories: { $exists: true } });
+        return { categories, menu, bg, message };
     } catch (error) {
         console.error('Error getting categories:', error);
         throw error;

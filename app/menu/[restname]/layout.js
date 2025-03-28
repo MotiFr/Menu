@@ -84,7 +84,7 @@ export default async function RestaurantLayout({ params, children }) {
     return (
         <div className="min-h-screen flex flex-col">
             <Script
-                src="https://cdn.enable.co.il/licenses/enable-L40551evm91dijcz-0325-69724/init.js"
+                src="https://cdn.enable.co.il/licenses/enable-L40551evm91dijcz-0325-69756/init.js"
                 strategy="afterInteractive"
             />
             <Suspense fallback={<LoadingSkeleton />}>

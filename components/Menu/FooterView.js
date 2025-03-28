@@ -66,7 +66,7 @@ const MenuFooter = ({ currentLang, currentTheme, Footer }) => {
                 )}
 
                 {hasSocialLinks && (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3" aria-label="Social Media Links">
                         {renderSocialButton('instagram', Instagram)}
                         {renderSocialButton('facebook', Facebook)}
                         {renderSocialButton('twitter', Twitter)}

@@ -5,20 +5,58 @@ import MenuFooter from "../Menu/FooterView";
 import MenuCard from "../Menu/MenuCard";
 import ThemedBackground from "../Menu/ThemeBG";
 import ViewTracker from "../Menu/ViewTracker";
-import { categoryClasses } from '@/components/Menu/Themes';
-import { useEffect, useState } from "react";
+import { categoryClasses, themes } from '@/components/Menu/Themes';
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Badge } from '@/components/ui/badge';
 
-
-
-export default function Def({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname, bg }) {
+export default function Def({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname, bg, message }) {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState('heb');
+  const [showMessage, setShowMessage] = useState(true);
+  const [progress, setProgress] = useState(100);
+  const [isScrolled, setIsScrolled] = useState(false);
   const isRTL = lang === 'heb';
   const [showAllergens, setShowAllergens] = useState(false);
   const [filteredAllergens, setFilteredAllergens] = useState([]);
-  
+  const [specificItem, setSpecificItem] = useState(null);
+  const [expandedCategory, setExpandedCategory] = useState('');
+  const activeTheme = themes[theme] || themes.default;
+  const categoryRefs = useRef({});
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 64);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (message) {
+      const initialTime = message.time || 10;
+      setProgress(100);
+      const timer = setInterval(() => {
+        setProgress((prev) => {
+          if (prev <= 0) {
+            clearInterval(timer);
+            setShowMessage(false);
+            return 0;
+          }
+          return prev - (100 / initialTime);
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (expandedCategory && categoryRefs.current[expandedCategory]) {
+      categoryRefs.current[expandedCategory].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [expandedCategory]);
+
   useEffect(() => {
     const langParam = searchParams.get('lang');
     if (langParam) {
@@ -77,7 +115,48 @@ export default function Def({ CATEGORIES, theme, header, description, menu, foot
       <div className="min-h-screen transition-all duration-500" dir={isRTL ? 'rtl' : 'ltr'}>
         <ThemedBackground theme={theme} customBg={bg} />
         
-        <div className="max-w-7xl mx-auto px-2 py-8">
+        {message && showMessage && (
+          <div className={`fixed z-50 animate-slide-down transition-all duration-300 ${isScrolled ? 'top-0' : 'top-16'} left-0 right-0 flex justify-center`}>
+            <div className="w-full max-w-2xl px-4">
+              <div 
+                onClick={(e) => {
+                  if (e.target.closest('button')) return;
+                  
+                  if (message?.item) {
+                    setExpandedCategory(message.item.category);
+                    setSpecificItem(message.item._id);
+                    setShowMessage(false);
+                  }
+                }}
+                className="relative p-4 rounded-b-xl shadow-xl border-b backdrop-blur-md cursor-pointer"
+                style={{
+                  backgroundColor: `${activeTheme.primary}dd`,
+                  borderColor: `${activeTheme.secondary}40`,
+                }}
+              >
+                <div className="absolute top-0 left-0 h-1.5 bg-white/20 w-full">
+                  <div 
+                    className="h-full bg-white/40 transition-all duration-1000 ease-linear"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-medium text-white">
+                    {getLocalizedValue(message.eng, message.heb)}
+                  </span>
+                  <button 
+                    onClick={() => setShowMessage(false)}
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className={`max-w-7xl mx-auto px-2 py-8 ${message && showMessage ? 'mt-32' : ''}`}>
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-6">
               {getLocalizedValue(header.eng, header.heb)}
@@ -154,6 +233,8 @@ export default function Def({ CATEGORIES, theme, header, description, menu, foot
               return (
                 <details
                   key={`category-${category.name}`}
+                  ref={el => categoryRefs.current[category.name] = el}
+                  open={category.name === expandedCategory}
                   className={`${categoryClasses[theme]} rounded-2xl border backdrop-blur-md p-2 group`}
                 >
                   <summary className="pb-4 justify-between items-center cursor-pointer list-none select-none">
@@ -179,6 +260,8 @@ export default function Def({ CATEGORIES, theme, header, description, menu, foot
                         }))}
                         theme={theme}
                         isRTL={isRTL}
+                        specificItem={specificItem}
+                        onSpecificItemOpen={setSpecificItem}
                       />
                     </div>
                   </div>

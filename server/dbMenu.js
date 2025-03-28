@@ -3,7 +3,7 @@ import { getMongoClient, getRestaurant } from "./dbRest";
 import { revalidatePath } from "next/cache";
 
 
-export async function changeMenu(theme, header, description, menu, bg) {
+export async function changeMenu(theme, header, description, menu, bg, message) {
     try {
         const restname = await getRestaurant();
         const client = await getMongoClient();
@@ -17,7 +17,8 @@ export async function changeMenu(theme, header, description, menu, bg) {
                     header: header,
                     description: description,
                     menu: menu,
-                    bg: bg
+                    bg: bg,
+                    message: message
                 }
             }
         );
@@ -108,8 +109,10 @@ export async function getRestInfo(restname) {
         const socialLinks = details.socialLinks
         const menu = details.menu
         const bg = details.bg
+        const message = details.message
 
-        return { items, categories, theme, header, description, footerText, socialLinks, menu, bg };
+
+        return { items, categories, theme, header, description, footerText, socialLinks, menu, bg, message };
     } catch (error) {
         console.error('Error getting restaurant info:', error);
     }

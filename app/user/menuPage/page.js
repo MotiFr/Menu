@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import ThemedBackground from '@/components/Menu/ThemeBG';
 import { themes } from '@/components/Menu/Themes';
 import AutoResizeTextarea from '@/components/Menu/TextareaSize';
-import { List, LayoutGrid, Image as ImageIcon } from 'lucide-react';
+import { List, LayoutGrid, Image as ImageIcon, MessageSquare, X } from 'lucide-react';
 import CategoryMenu from '@/components/ViewMenu/CategoryMenu';
 import Def from '@/components/ViewMenu/Def';
 import {
@@ -19,6 +19,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const translations = {
   eng: {
@@ -38,8 +45,11 @@ const translations = {
     socialLinks: "Social media links",
     footerText: "Footer text",
     editFooter: "Edit footer",
-
-
+    setMessage: "Set Message",
+    messageText: "Message Text",
+    messageTime: "Message Duration (seconds)",
+    selectItem: "Select Menu Item",
+    noItem: "No specific item",
   },
   heb: {
     chooseTheme: "בחר עיצוב",
@@ -58,6 +68,11 @@ const translations = {
     socialLinks: "קישור לרשתות חברתיות",
     footerText: "טקסט תחתית",
     editFooter: "ערוך תחתית",
+    setMessage: "הגדר הודעה",
+    messageText: "טקסט ההודעה",
+    messageTime: "משך זמן ההודעה (שניות)",
+    selectItem: "בחר פריט מהתפריט",
+    noItem: "ללא פריט ספציפי",
   }
 };
 
@@ -219,6 +234,137 @@ const BackgroundImageDialog = ({ isOpen, onClose, onSave, currentLang, currentIm
   );
 };
 
+const MessageDialog = ({ isOpen, onClose, onSave, currentLang, menu, currentMessage, theme }) => {
+  const [message, setMessage] = useState({
+    heb: currentMessage?.heb || '',
+    eng: currentMessage?.eng || '',
+    time: currentMessage?.time || 10,
+    item: currentMessage?.item || null
+  });
+  const activeTheme = themes[theme] || themes.default;
+
+  const handleSave = () => {
+    onSave(message);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            {currentLang === 'heb' ? 'הגדר הודעה' : 'Set Message'}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          {/* Message Preview */}
+          <div className="mb-4 p-4 rounded-lg border bg-gray-50 dark:bg-gray-900">
+            <h3 className="text-sm font-medium mb-2">{currentLang === 'heb' ? 'תצוגה מקדימה' : 'Preview'}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              {currentLang === 'heb' 
+                ? 'ההודעה תופיע בראש התפריט. אם בחרת פריט, לחץ על ההודעה יגלול אליו. מומלץ להוסיף "לחץ כאן" להודעה.'
+                : 'The message will appear at the top of the menu. If you selected an item, clicking the message will scroll to it. It\'s recommended to add "Click here" to the message.'}
+            </p>
+            <div 
+              className="relative p-4 rounded-xl shadow-lg border-b backdrop-blur-md"
+              style={{
+                backgroundColor: `${activeTheme.primary}dd`,
+                borderColor: `${activeTheme.secondary}40`,
+              }}
+            >
+              <div className="absolute top-0 left-0 h-1.5 bg-white/20 w-full">
+                <div 
+                  className="h-full bg-white/40 transition-all duration-1000 ease-linear"
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-base font-medium text-white">
+                  {currentLang === 'heb' ? message.heb : message.eng}
+                </span>
+                <div className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                  <X className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Message Input Fields */}
+          <div className="grid gap-2">
+            <Label htmlFor="message-heb">
+              {currentLang === 'heb' ? 'הודעה בעברית' : 'Hebrew Message'}
+            </Label>
+            <Input
+              id="message-heb"
+              value={message.heb}
+              onChange={(e) => setMessage(prev => ({ ...prev, heb: e.target.value }))}
+              placeholder={currentLang === 'heb' ? 'הכנס הודעה בעברית' : 'Enter Hebrew message'}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="message-eng">
+              {currentLang === 'heb' ? 'הודעה באנגלית' : 'English Message'}
+            </Label>
+            <Input
+              id="message-eng"
+              value={message.eng}
+              onChange={(e) => setMessage(prev => ({ ...prev, eng: e.target.value }))}
+              placeholder={currentLang === 'heb' ? 'הכנס הודעה באנגלית' : 'Enter English message'}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="message-time">
+              {currentLang === 'heb' ? 'משך זמן (שניות)' : 'Duration (seconds)'}
+            </Label>
+            <Input
+              id="message-time"
+              type="number"
+              min="1"
+              max="60"
+              value={message.time}
+              onChange={(e) => setMessage(prev => ({ ...prev, time: parseInt(e.target.value) || 10 }))}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>
+              {currentLang === 'heb' ? 'בחר פריט מהתפריט' : 'Select Menu Item'}
+            </Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  {message.item ? (currentLang === 'heb' ? message.item.name_heb : message.item.name_eng) : (currentLang === 'heb' ? 'ללא פריט ספציפי' : 'No specific item')}
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full max-h-[200px] overflow-y-auto">
+                <DropdownMenuItem onClick={() => setMessage(prev => ({ ...prev, item: null }))}>
+                  {currentLang === 'heb' ? 'ללא פריט ספציפי' : 'No specific item'}
+                </DropdownMenuItem>
+                {menu.map(item => (
+                  <DropdownMenuItem
+                    key={item._id}
+                    onClick={() => setMessage(prev => ({ ...prev, item }))}
+                  >
+                    {currentLang === 'heb' ? item.name_heb : item.name_eng}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
+            {currentLang === 'heb' ? 'ביטול' : 'Cancel'}
+          </Button>
+          <Button onClick={handleSave}>
+            {currentLang === 'heb' ? 'שמור' : 'Save'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export default function MenuPageClient() {
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
@@ -267,6 +413,8 @@ export default function MenuPageClient() {
   const [socialLinks, setSocialLinks] = useState([]);
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
 
   const redirect = useCallback(() => {
     window.location.href = '/';
@@ -295,6 +443,7 @@ export default function MenuPageClient() {
         setFooterText(json.footerText);
         setSocialLinks(json.socialLinks);
         setBackgroundImage(json.bg);
+        setMessage(json.message);
 
       } catch (err) {
         setError(err);
@@ -375,7 +524,8 @@ export default function MenuPageClient() {
             heb: menuDescriptions.heb,
             eng: menuDescriptions.eng
           },
-          bg: backgroundImage
+          bg: backgroundImage,
+          message: message
         }),
       });
 
@@ -475,7 +625,7 @@ export default function MenuPageClient() {
           </div>
 
           {/* Add background image button */}
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-4">
             <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
               <DialogTrigger asChild>
                 <Button
@@ -495,6 +645,30 @@ export default function MenuPageClient() {
                 }}
                 currentLang={currentLang}
                 currentImage={backgroundImage}
+              />
+            </Dialog>
+
+            <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full max-w-xs"
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  {currentLang === 'heb' ? 'הגדר הודעה' : 'Set Message'}
+                </Button>
+              </DialogTrigger>
+              <MessageDialog
+                isOpen={isMessageDialogOpen}
+                onClose={() => setIsMessageDialogOpen(false)}
+                onSave={(newMessage) => {
+                  setMessage(newMessage);
+                  setIsThemed(true);
+                }}
+                currentLang={currentLang}
+                menu={menu}
+                currentMessage={message}
+                theme={currentTheme}
               />
             </Dialog>
           </div>
@@ -558,6 +732,7 @@ export default function MenuPageClient() {
                 menu={menu}
                 footerText={footerText}
                 socialLinks={socialLinks}
+                message={message}
               />
             ) : (
               <Def
@@ -569,6 +744,7 @@ export default function MenuPageClient() {
                 menu={menu}
                 footerText={footerText}
                 socialLinks={socialLinks}
+                message={message}
               />
             )
           }

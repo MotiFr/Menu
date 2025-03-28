@@ -6,20 +6,53 @@ import MenuCardCategories from "../Menu/MenuCardCategories";
 import ThemedBackground from "../Menu/ThemeBG";
 import ViewTracker from "../Menu/ViewTracker";
 import { categoryClasses, themes } from '@/components/Menu/Themes';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
-export default function CategoryMenu({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname = "moti", bg }) {
+export default function CategoryMenu({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname = "moti", bg, message }) {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState('heb');
+  const [showMessage, setShowMessage] = useState(true);
+  const [progress, setProgress] = useState(100);
+  const [isScrolled, setIsScrolled] = useState(false);
   const isRTL = lang === 'heb';
   const [showAllergens, setShowAllergens] = useState(false);
   const [filteredAllergens, setFilteredAllergens] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const activeTheme = themes[theme] || themes.default;
-  
+  const [specificItem, setSpecificItem] = useState(null);
+  const itemRef = useRef(null);
+  const categoryContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 64); // 64px is the height of the navbar
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (message) {
+      const initialTime = message.time || 10;
+      setProgress(100);
+      const timer = setInterval(() => {
+        setProgress((prev) => {
+          if (prev <= 0) {
+            clearInterval(timer);
+            setShowMessage(false);
+            return 0;
+          }
+          return prev - (100 / initialTime);
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [message]);
+
   useEffect(() => {
     const langParam = searchParams.get('lang');
     if (langParam) {
@@ -32,6 +65,12 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
       setSelectedCategory(CATEGORIES[0].name);
     }
   }, [CATEGORIES]);
+  
+  useEffect(() => {
+    if (specificItem && itemRef.current) {
+      itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [specificItem, selectedCategory]);
   
   const getLocalizedValue = (engValue, hebValue) => lang === 'eng' ? engValue : hebValue;
   
@@ -79,12 +118,71 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
     setShowAllergens(!showAllergens);
   };
 
+  const scrollToCategory = (categoryName) => {
+    if (categoryContainerRef.current) {
+      const container = categoryContainerRef.current;
+      const categoryElement = container.querySelector(`[data-category="${categoryName}"]`);
+      if (categoryElement) {
+        const containerWidth = container.clientWidth;
+        const elementLeft = categoryElement.offsetLeft;
+        const elementWidth = categoryElement.offsetWidth;
+        const scrollPosition = elementLeft - (containerWidth / 2) + (elementWidth / 2);
+        
+        container.scrollTo({
+          left: scrollPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen transition-all duration-500" dir={isRTL ? 'rtl' : 'ltr'}>
         <ThemedBackground theme={theme} customBg={bg} />
         
-        <div className="max-w-2xl mx-auto px-2 pt-6">
+        {message && showMessage && (
+          <div className={`fixed z-50 animate-slide-down transition-all duration-300 ${isScrolled ? 'top-0' : 'top-16'} left-0 right-0 flex justify-center`}>
+            <div className="w-full max-w-2xl px-4">
+              <div 
+                onClick={(e) => {
+                  if (e.target.closest('button')) return;
+                  
+                  if (message?.item) {
+                    setSelectedCategory(message.item.category);
+                    setSpecificItem(message.item._id);
+                    scrollToCategory(message.item.category);
+                  }
+                }}
+                className="relative p-4 rounded-b-xl shadow-xl border-b backdrop-blur-md cursor-pointer"
+                style={{
+                  backgroundColor: `${activeTheme.primary}dd`,
+                  borderColor: `${activeTheme.secondary}40`,
+                }}
+              >
+                <div className="absolute top-0 left-0 h-1.5 bg-white/20 w-full">
+                  <div 
+                    className="h-full bg-white/40 transition-all duration-1000 ease-linear"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-medium text-white">
+                    {getLocalizedValue(message.eng, message.heb)}
+                  </span>
+                  <button 
+                    onClick={() => setShowMessage(false)}
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className={`max-w-2xl mx-auto px-2 pt-6 ${message && showMessage ? 'mt-32' : ''}`}>
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold mb-4 dark:text-white pb-6">
               {getLocalizedValue(header.eng, header.heb)}
@@ -98,6 +196,7 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
           {/* Category Section */}
           <div className="w-full mx-auto relative">
             <div
+              ref={categoryContainerRef}
               className="category-scroll-container overflow-x-auto scrollbar-hide w-full py-3 relative"
               style={{
                 scrollBehavior: 'smooth',
@@ -112,7 +211,11 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
                 }).map((category) => (
                   <button
                     key={category.name}
-                    onClick={() => setSelectedCategory(category.name)}
+                    data-category={category.name}
+                    onClick={() => {
+                      setSelectedCategory(category.name);
+                      scrollToCategory(category.name);
+                    }}
                     className={`relative px-6 py-3 rounded-xl transition-all duration-300 text-base font-medium whitespace-nowrap scroll-snap-align-center flex-shrink-0 overflow-hidden ${
                       selectedCategory === category.name
                         ? 'shadow-2xl ring-4 ring-opacity-80'
@@ -269,14 +372,17 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
                   <div className="mt-6">
                     <div className="space-y-2">
                       <MenuCardCategories
+                        specificItem={specificItem}
                         items={filteredItems.map((item, idx) => ({
                           ...item, 
                           key: `${category.name}-item-${idx}`,
                           name: getLocalizedValue(item.name_eng, item.name_heb),
-                          description: getLocalizedValue(item.description_eng, item.description_heb)
+                          description: getLocalizedValue(item.description_eng, item.description_heb),
+                          ref: item._id === specificItem ? itemRef : null
                         }))}
                         theme={theme}
                         isRTL={isRTL}
+                        onSpecificItemOpen={setSpecificItem}
                       />
                     </div>
                   </div>

@@ -1,16 +1,36 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MenuItemDialog from "./MenuItemDialog";
 import Image from "next/image";
 import { menuItemClasses } from '@/components/Menu/Themes';
 
-export default function MenuCard({ items, theme = 'default', isRTL = false }) {
+export default function MenuCard({ items, theme = 'default', isRTL = false, specificItem = null, onSpecificItemOpen = () => {} }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (specificItem) {
+      const item = items.find(item => item._id === specificItem);
+      if (item) {
+        // Add a small delay before opening
+        const timer = setTimeout(() => {
+          setSelectedItem(item);
+          setIsDialogOpen(true);
+        }, 400); // delay of 800ms
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [specificItem, items]);
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
     setIsDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsDialogOpen(false);
+    setSelectedItem(null);
+    onSpecificItemOpen(null); // Clear the specificItem in the parent
   };
 
   return (
@@ -20,9 +40,10 @@ export default function MenuCard({ items, theme = 'default', isRTL = false }) {
           item.seen && (
             <div
               key={item._id}
+              ref={item.ref}
               onClick={() => handleItemClick(item)}
               className={`${menuItemClasses[theme]} relative cursor-pointer 
-                transition-all duration-300`}
+                transition-all duration-300 hover:scale-102 hover:shadow-lg`}
             >
               <div className="relative h-32 w-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
                 {item.url ? (
@@ -118,7 +139,7 @@ export default function MenuCard({ items, theme = 'default', isRTL = false }) {
         theme={theme}
         item={selectedItem}
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={handleClose}
         isRTL={isRTL}
       />
     </>

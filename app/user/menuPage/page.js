@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import ThemedBackground from '@/components/Menu/ThemeBG';
 import { themes } from '@/components/Menu/Themes';
 import AutoResizeTextarea from '@/components/Menu/TextareaSize';
-import { List, LayoutGrid, Image as ImageIcon, MessageSquare, X } from 'lucide-react';
+import { List, LayoutGrid, Image as ImageIcon, MessageSquare, X, Instagram, Facebook, Twitter, Globe, Phone, Mail } from 'lucide-react';
 import CategoryMenu from '@/components/ViewMenu/CategoryMenu';
 import Def from '@/components/ViewMenu/Def';
 import {
@@ -50,6 +50,19 @@ const translations = {
     messageTime: "Message Duration (seconds)",
     selectItem: "Select Menu Item",
     noItem: "No specific item",
+    footerTextHeb: "Hebrew Footer Text",
+    footerTextEng: "English Footer Text",
+    socialMediaLinks: "Social Media Links",
+    instagramUrl: "Instagram URL",
+    facebookUrl: "Facebook URL",
+    twitterUrl: "Twitter URL",
+    websiteUrl: "Website URL",
+    phoneNumber: "Phone Number",
+    emailAddress: "Email Address",
+    enterFooterText: "Enter footer text",
+    enterSocialLinks: "Enter social media links",
+    saveFooter: "Save Footer",
+    cancelFooter: "Cancel Footer",
   },
   heb: {
     chooseTheme: "בחר עיצוב",
@@ -73,6 +86,19 @@ const translations = {
     messageTime: "משך זמן ההודעה (שניות)",
     selectItem: "בחר פריט מהתפריט",
     noItem: "ללא פריט ספציפי",
+    footerTextHeb: "טקסט תחתית בעברית",
+    footerTextEng: "טקסט תחתית באנגלית",
+    socialMediaLinks: "קישורים לרשתות חברתיות",
+    instagramUrl: "קישור לאינסטגרם",
+    facebookUrl: "קישור לפייסבוק",
+    twitterUrl: "קישור לטוויטר",
+    websiteUrl: "קישור לאתר",
+    phoneNumber: "מספר טלפון",
+    emailAddress: "כתובת אימייל",
+    enterFooterText: "הכנס טקסט תחתית",
+    enterSocialLinks: "הכנס קישורים לרשתות חברתיות",
+    saveFooter: "שמור תחתית",
+    cancelFooter: "ביטול תחתית",
   }
 };
 
@@ -365,6 +391,157 @@ const MessageDialog = ({ isOpen, onClose, onSave, currentLang, menu, currentMess
   );
 };
 
+const FooterEditDialog = ({ isOpen, onClose, onSave, currentLang, currentFooter, currentSocialLinks, t }) => {
+  const [footerText, setFooterText] = useState({
+    heb: currentFooter?.heb || '',
+    eng: currentFooter?.eng || ''
+  });
+  const [socialLinks, setSocialLinks] = useState({
+    instagram: currentSocialLinks?.instagram || '',
+    facebook: currentSocialLinks?.facebook || '',
+    twitter: currentSocialLinks?.twitter || '',
+    website: currentSocialLinks?.website || '',
+    phone: currentSocialLinks?.phone || '',
+    email: currentSocialLinks?.email || ''
+  });
+
+  useEffect(() => {
+    if (currentFooter) {
+      setFooterText(currentFooter);
+    }
+    if (currentSocialLinks) {
+      setSocialLinks(currentSocialLinks);
+    }
+  }, [currentFooter, currentSocialLinks]);
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/footer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          footerText,
+          socialLinks
+        }),
+      });
+
+      if (response.ok) {
+        onSave({ footerText, socialLinks });
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error saving footer data:", error);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            {t.editFooter}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="footer-text-heb">
+              {t.footerTextHeb}
+            </Label>
+            <AutoResizeTextarea
+              id="footer-text-heb"
+              className="bg-inherit w-full"
+              placeholder={t.enterFooterText}
+              value={footerText.heb}
+              onChange={e => setFooterText(prev => ({ ...prev, heb: e.target.value }))}
+              dir="rtl"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="footer-text-eng">
+              {t.footerTextEng}
+            </Label>
+            <AutoResizeTextarea
+              id="footer-text-eng"
+              className="bg-inherit w-full"
+              placeholder={t.enterFooterText}
+              value={footerText.eng}
+              onChange={e => setFooterText(prev => ({ ...prev, eng: e.target.value }))}
+              dir="ltr"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label>
+              {t.socialMediaLinks}
+            </Label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Instagram className="h-4 w-4" />
+                <Input
+                  placeholder={t.instagramUrl}
+                  value={socialLinks.instagram}
+                  onChange={(e) => setSocialLinks(prev => ({ ...prev, instagram: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Facebook className="h-4 w-4" />
+                <Input
+                  placeholder={t.facebookUrl}
+                  value={socialLinks.facebook}
+                  onChange={(e) => setSocialLinks(prev => ({ ...prev, facebook: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Twitter className="h-4 w-4" />
+                <Input
+                  placeholder={t.twitterUrl}
+                  value={socialLinks.twitter}
+                  onChange={(e) => setSocialLinks(prev => ({ ...prev, twitter: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                <Input
+                  placeholder={t.websiteUrl}
+                  value={socialLinks.website}
+                  onChange={(e) => setSocialLinks(prev => ({ ...prev, website: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <Input
+                  placeholder={t.phoneNumber}
+                  value={socialLinks.phone}
+                  onChange={(e) => setSocialLinks(prev => ({ ...prev, phone: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <Input
+                  placeholder={t.emailAddress}
+                  value={socialLinks.email}
+                  onChange={(e) => setSocialLinks(prev => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
+            {t.cancelFooter}
+          </Button>
+          <Button onClick={handleSave}>
+            {t.saveFooter}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export default function MenuPageClient() {
   const searchParams = useSearchParams();
   const [currentLang, setCurrentLang] = useState('heb');
@@ -415,6 +592,7 @@ export default function MenuPageClient() {
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [message, setMessage] = useState(null);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+  const [isFooterDialogOpen, setIsFooterDialogOpen] = useState(false);
 
   const redirect = useCallback(() => {
     window.location.href = '/';
@@ -669,6 +847,31 @@ export default function MenuPageClient() {
                 menu={menu}
                 currentMessage={message}
                 theme={currentTheme}
+              />
+            </Dialog>
+
+            <Dialog open={isFooterDialogOpen} onOpenChange={setIsFooterDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full max-w-xs"
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  {currentLang === 'heb' ? 'ערוך תחתית' : 'Edit Footer'}
+                </Button>
+              </DialogTrigger>
+              <FooterEditDialog
+                isOpen={isFooterDialogOpen}
+                onClose={() => setIsFooterDialogOpen(false)}
+                onSave={(newFooter) => {
+                  setFooterText(newFooter.footerText);
+                  setSocialLinks(newFooter.socialLinks);
+                  setIsThemed(true);
+                }}
+                currentLang={currentLang}
+                currentFooter={footerText}
+                currentSocialLinks={socialLinks}
+                t={t}
               />
             </Dialog>
           </div>

@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTheme } from "@/server/dbMenu";
 import { unstable_cache } from 'next/cache';
@@ -74,7 +75,7 @@ export default async function RestaurantLayout({ params, children }) {
     const theme = await getCachedTheme(restname);
     
     // Set this to true to enable maintenance mode
-    const isMaintenanceMode = true;
+    const isMaintenanceMode = false;
 
     if (isMaintenanceMode) {
         return <MaintenancePage />;
@@ -82,6 +83,10 @@ export default async function RestaurantLayout({ params, children }) {
 
     return (
         <div className="min-h-screen flex flex-col">
+            <Script
+                src="https://cdn.enable.co.il/licenses/enable-L40551evm91dijcz-0325-69724/init.js"
+                strategy="afterInteractive"
+            />
             <Suspense fallback={<LoadingSkeleton />}>
                 <NavTopMenu
                     restname={restname}

@@ -8,6 +8,9 @@ export default {
   darkMode: 'class',
   theme: {
   	extend: {
+  		fontFamily: {
+  			heebo: ['var(--font-heebo)'],
+  		},
   		colors: {
 			primary: {
 				DEFAULT: 'hsl(var(--color-primary))',

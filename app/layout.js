@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { Heebo } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +12,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const heebo = Heebo({
+  variable: "--font-heebo",
+  subsets: ["latin", "hebrew"],
+});
+
 export const metadata = {
   title: "Menu app",
   description: "Create a QR menu web app",
@@ -18,12 +24,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    
-    <html lang="en" >
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${heebo.variable} font-heebo antialiased`}
       >
-        
         {children}
       </body>
     </html>

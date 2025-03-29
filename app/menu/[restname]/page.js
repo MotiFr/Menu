@@ -3,6 +3,7 @@ import { revalidatePath, unstable_cache } from 'next/cache';
 import ErrorRetryButton from "@/components/Menu/ReloadButton";
 import Def from "@/components/ViewMenu/Def";
 import CategoryMenu from "@/components/ViewMenu/CategoryMenu";
+import SimulatedPointer from "@/components/SimulatedPointer";
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -94,7 +95,6 @@ export async function revalidateMenuAction(restname) {
 export default async function Menu({ params }) {
   const restname = (await params).restname;
 
-
   try {
     const restInfo = await fetchRestaurantData(restname);
 
@@ -114,38 +114,39 @@ export default async function Menu({ params }) {
       bg,
       message
     } = restInfo;
-    if (menu === 'CategoryMenu') {
-      return (
-        <CategoryMenu
-        message={message}
-        CATEGORIES={CATEGORIES}
-        theme={theme}
-        header={header}
-        description={description}
-        menu={items}
-        bg={bg}
-        footerText={footerText}
-        socialLinks={socialLinks}
-        restname={restname}
-      />
-      )
 
-    } else {
-      return (
-        <Def
-        message={message}
-        CATEGORIES={CATEGORIES}
-        theme={theme}
-        bg={bg}
-        header={header}
-        description={description}
-        menu={items}
-        footerText={footerText}
-        socialLinks={socialLinks}
-        restname={restname}
-      />
-      )
-    }
+    return (
+      <>
+        <SimulatedPointer />
+        {menu === 'CategoryMenu' ? (
+          <CategoryMenu
+            message={message}
+            CATEGORIES={CATEGORIES}
+            theme={theme}
+            header={header}
+            description={description}
+            menu={items}
+            bg={bg}
+            footerText={footerText}
+            socialLinks={socialLinks}
+            restname={restname}
+          />
+        ) : (
+          <Def
+            message={message}
+            CATEGORIES={CATEGORIES}
+            theme={theme}
+            bg={bg}
+            header={header}
+            description={description}
+            menu={items}
+            footerText={footerText}
+            socialLinks={socialLinks}
+            restname={restname}
+          />
+        )}
+      </>
+    );
 
   } catch (error) {
     console.error(`Error rendering menu for ${restname}:`, error);

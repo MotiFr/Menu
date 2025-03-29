@@ -28,7 +28,7 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 64); // 64px is the height of the navbar
+      setIsScrolled(window.scrollY > 64); 
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -80,14 +80,21 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
     menu.forEach(item => {
       if (item.allergens && item.allergens.length > 0) {
         item.allergens.forEach(allergen => {
-          if (!allAllergens.has(allergen.eng)) {
-            allAllergens.set(allergen.eng, allergen);
+          // Check if we already have an allergen with the same Hebrew name
+          const existingAllergen = Array.from(allAllergens.values()).find(
+            a => a.heb === allergen.heb
+          );
+          
+          if (!existingAllergen) {
+            allAllergens.set(allergen.heb, allergen);
           }
         });
       }
     });
     
-    return Array.from(allAllergens.values());
+    return Array.from(allAllergens.values()).sort((a, b) => 
+      a.heb.localeCompare(b.heb)
+    );
   };
   
   const allergensList = getAllergens();
@@ -99,7 +106,7 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
       if (!item.allergens || item.allergens.length === 0) return true;
       
       const hasFilteredAllergen = item.allergens.some(allergen => 
-        filteredAllergens.includes(allergen.eng)
+        filteredAllergens.includes(allergen.heb)
       );
       
       return !hasFilteredAllergen;
@@ -108,9 +115,9 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
   
   const toggleAllergenFilter = (allergen) => {
     setFilteredAllergens(prev => 
-      prev.includes(allergen.eng) 
-        ? prev.filter(a => a !== allergen.eng) 
-        : [...prev, allergen.eng]
+      prev.includes(allergen.heb) 
+        ? prev.filter(a => a !== allergen.heb) 
+        : [...prev, allergen.heb]
     );
   };
 
@@ -333,13 +340,13 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
                   <div className="flex flex-wrap gap-2 pb-4">
                     {allergensList.map((allergen) => (
                       <Badge
-                        key={allergen.eng}
-                        variant={filteredAllergens.includes(allergen.eng) ? "default" : "outline"}
-                        className={`text-base cursor-pointer px-2 py-0.5 ${filteredAllergens.includes(allergen.eng) ? "bg-red-500 hover:bg-red-600" : "hover:bg-gray-200 dark:hover:bg-gray-700"}`}
+                        key={allergen.heb}
+                        variant={filteredAllergens.includes(allergen.heb) ? "default" : "outline"}
+                        className={`text-base cursor-pointer px-2 py-0.5 ${filteredAllergens.includes(allergen.heb) ? "bg-red-500 hover:bg-red-600" : "hover:bg-gray-200 dark:hover:bg-gray-700"}`}
                         onClick={() => toggleAllergenFilter(allergen)}
                       >
                         {isRTL ? allergen.heb : allergen.eng}
-                        {filteredAllergens.includes(allergen.eng) && (
+                        {filteredAllergens.includes(allergen.heb) && (
                           <X className="w-4 h-4 ml-1" />
                         )}
                       </Badge>

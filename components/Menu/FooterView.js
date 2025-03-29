@@ -38,6 +38,7 @@ const MenuFooter = ({ currentLang, currentTheme, Footer }) => {
                     platform === 'phone' ? `tel:${url}` : formatUrl(url)}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={`${platform.charAt(0).toUpperCase() + platform.slice(1)} link`}
                 className="inline-block p-2 rounded-full bg-white/10 dark:bg-black/10 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300"
             >
                 <Icon size={20} className={getIconColor()} />

@@ -1,5 +1,5 @@
 "use client"
-import { QrCode, Loader2 } from "lucide-react";
+import { QrCode } from "lucide-react";
 import { useQRCode } from "next-qrcode";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";

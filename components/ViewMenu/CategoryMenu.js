@@ -14,7 +14,7 @@ import Image from 'next/image';
 export default function CategoryMenu({ CATEGORIES, theme, header, description, menu, footerText, socialLinks, restname = "moti", bg, message }) {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState('heb');
-  const [showMessage, setShowMessage] = useState(true);
+  const [showMessage, setShowMessage] = useState(false);
   const [progress, setProgress] = useState(100);
   const [isScrolled, setIsScrolled] = useState(false);
   const isRTL = lang === 'heb';
@@ -36,7 +36,8 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
   }, []);
 
   useEffect(() => {
-    if (message) {
+    if (message && (message.heb !== '' || message.eng !== '')) {
+      setShowMessage(true);
       const initialTime = message.time || 10;
       setProgress(100);
       const timer = setInterval(() => {
@@ -50,7 +51,7 @@ export default function CategoryMenu({ CATEGORIES, theme, header, description, m
         });
       }, 1000);
       return () => clearInterval(timer);
-    }
+    } 
   }, [message]);
 
   useEffect(() => {

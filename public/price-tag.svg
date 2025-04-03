@@ -1,0 +1,53 @@
+<svg width="100" height="140" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="tag-blur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.8" />
+    </filter>
+  </defs>
+  
+  <!-- Main tag shape with hand-drawn imperfect lines -->
+  <path d="M10,10 C12,8 88,8 90,10 C92,12 92,100 90,105 C88,110 50,135 50,135 C50,135 12,110 10,105 C8,100 8,12 10,10 Z" 
+        fill="currentColor" 
+        opacity="0.9"
+        filter="url(#tag-blur)" />
+  
+  <!-- Tag hole -->
+  <circle cx="50" cy="25" r="10" fill="white" opacity="0.7" />
+  <circle cx="50" cy="25" r="8" fill="none" stroke="white" stroke-width="1" opacity="0.9" />
+  
+  <!-- Shine effect on tag -->
+  <path d="M20,20 C30,18 70,18 80,20 C82,22 82,30 80,32 C70,34 30,34 20,32 C18,30 18,22 20,20 Z" 
+        fill="white" 
+        opacity="0.1" />
+  
+  <!-- Artistic border with hand-drawn look -->
+  <path d="M15,15 C17,13 83,13 85,15 C87,17 87,98 85,102 C83,106 50,127 50,127 C50,127 17,106 15,102 C13,98 13,17 15,15 Z" 
+        fill="none" 
+        stroke="white" 
+        stroke-width="1.5" 
+        stroke-dasharray="2 1"
+        opacity="0.4" />
+  
+  <!-- Price circle with imperfect hand-drawn edge -->
+  <circle cx="50" cy="70" r="25" 
+          fill="none" 
+          stroke="white" 
+          stroke-width="2"
+          stroke-dasharray="1 0.8"
+          opacity="0.6" />
+  
+  <!-- Decorative elements -->
+  <path d="M35,50 C40,55 60,55 65,50" 
+        fill="none" 
+        stroke="white" 
+        stroke-width="1.5" 
+        stroke-linecap="round"
+        opacity="0.6" />
+        
+  <path d="M35,90 C40,85 60,85 65,90" 
+        fill="none" 
+        stroke="white" 
+        stroke-width="1.5" 
+        stroke-linecap="round"
+        opacity="0.6" />
+</svg> 

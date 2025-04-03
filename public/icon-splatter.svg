@@ -1,0 +1,27 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="splatter-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+    </filter>
+  </defs>
+  
+  <!-- Main splatter -->
+  <path d="M30,30 
+         C32,20 36,25 38,18 
+         C41,22 39,27 45,25 
+         C42,30 37,29 40,35 
+         C35,37 36,32 30,35 
+         C27,32 29,36 24,34 
+         C26,29 30,30 27,25 
+         C32,23 30,27 30,30 Z" 
+        fill="currentColor" 
+        opacity="0.7"
+        filter="url(#splatter-blur)">
+  </path>
+  
+  <!-- Small splatters -->
+  <circle cx="40" cy="18" r="3" fill="currentColor" opacity="0.6" filter="url(#splatter-blur)" />
+  <circle cx="18" cy="35" r="4" fill="currentColor" opacity="0.5" filter="url(#splatter-blur)" />
+  <circle cx="22" cy="22" r="2" fill="currentColor" opacity="0.6" filter="url(#splatter-blur)" />
+  <circle cx="45" cy="40" r="3.5" fill="currentColor" opacity="0.5" filter="url(#splatter-blur)" />
+</svg> 

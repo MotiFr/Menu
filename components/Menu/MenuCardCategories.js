@@ -42,7 +42,7 @@ export default function MenuCard({ items, theme = 'default', isRTL = false, spec
               key={item._id}
               ref={item.ref}
               onClick={() => handleItemClick(item)}
-              className={`${menuItemClasses[theme]} relative cursor-pointer 
+              className={`${menuItemClasses[theme]} relative cursor-pointer rounded-lg
                 transition-all duration-300 hover:scale-102 hover:shadow-lg`}
             >
               <div className="relative h-32 w-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">

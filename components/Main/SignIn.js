@@ -5,11 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { Eye, EyeOff, User } from 'lucide-react';
+import { Eye, EyeOff, User, LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SignIn() {
+export default function SignIn({text = 'Login'}) {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -88,15 +88,17 @@ export default function SignIn() {
     <>
       {sessionCookie ? (<button
               onClick={() => router.push('/user/welcomePage')}
-              className={`border shadow-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-              Login
+              className={`flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 dark:from-amber-500 dark:to-amber-700 hover:from-amber-500 hover:to-amber-700 dark:hover:from-amber-600 dark:hover:to-amber-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ${isLoading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}>
+              <LogIn className="h-4 w-4" />
+              <span>{text}</span>
             </button>) :
         <Dialog>
           <DialogTrigger asChild>
             <button
               onClick={sessionCookie ? () => router.push('/user/welcomePage') : null}
-              className={`border shadow-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-              Login
+              className={`flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 dark:from-amber-500 dark:to-amber-700 hover:from-amber-500 hover:to-amber-700 dark:hover:from-amber-600 dark:hover:to-amber-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ${isLoading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}>
+              <LogIn className="h-4 w-4" />
+              <span>{text}</span>
             </button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
@@ -171,8 +173,9 @@ export default function SignIn() {
 
               <Button
                 type="submit"
-                className={`w-full text-white font-medium py-2.5 ${isLoading ? 'cursor-not-allowed bg-primary-light dark:bg-primary-light hover:bg-primary-light' : 'cursor-pointer  bg-primary dark:bg-primary-dark hover:bg-primary/90 dark:hover:bg-primary-dark/90'}`}
+                className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 dark:from-amber-500 dark:to-amber-700 hover:from-amber-500 hover:to-amber-700 dark:hover:from-amber-600 dark:hover:to-amber-800 text-white px-4 py-2.5 rounded-lg shadow-md transition-all duration-300 ${isLoading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
               >
+                <LogIn className="h-4 w-4" />
                 Login
               </Button>
             </form>

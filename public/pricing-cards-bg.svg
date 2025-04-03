@@ -1,0 +1,71 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="pricing-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+    </filter>
+    <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.05" />
+      <stop offset="50%" stop-color="currentColor" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0.05" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Artistic wave background patterns -->
+  <g opacity="0.6" filter="url(#pricing-blur)">
+    <!-- Primary wave patterns -->
+    <path d="M-50,100 C0,80 50,120 100,100 C150,80 200,120 250,100 C300,80 350,120 400,100 C450,80 500,120 550,100 L550,600 L-50,600 Z" 
+          fill="url(#wave-gradient)" opacity="0.2" />
+          
+    <path d="M-50,200 C0,180 50,220 100,200 C150,180 200,220 250,200 C300,180 350,220 400,200 C450,180 500,220 550,200 L550,600 L-50,600 Z" 
+          fill="url(#wave-gradient)" opacity="0.15" />
+          
+    <path d="M-50,300 C0,280 50,320 100,300 C150,280 200,320 250,300 C300,280 350,320 400,300 C450,280 500,320 550,300 L550,600 L-50,600 Z" 
+          fill="url(#wave-gradient)" opacity="0.1" />
+  </g>
+  
+  <!-- Horizontal ruled lines with hand-drawn feel -->
+  <g stroke="currentColor" stroke-width="0.5" opacity="0.3">
+    <path d="M20,50 C40,48 60,52 80,50 C100,48 120,52 140,50 C160,48 180,52 200,50 C220,48 240,52 260,50 C280,48 300,52 320,50 C340,48 360,52 380,50" 
+          fill="none" stroke-linecap="round" />
+          
+    <path d="M20,100 C40,98 60,102 80,100 C100,98 120,102 140,100 C160,98 180,102 200,100 C220,98 240,102 260,100 C280,98 300,102 320,100 C340,98 360,102 380,100" 
+          fill="none" stroke-linecap="round" />
+          
+    <path d="M20,150 C40,148 60,152 80,150 C100,148 120,152 140,150 C160,148 180,152 200,150 C220,148 240,152 260,150 C280,148 300,152 320,150 C340,148 360,152 380,150" 
+          fill="none" stroke-linecap="round" />
+          
+    <path d="M20,200 C40,198 60,202 80,200 C100,198 120,202 140,200 C160,198 180,202 200,200 C220,198 240,202 260,200 C280,198 300,202 320,200 C340,198 360,202 380,200" 
+          fill="none" stroke-linecap="round" />
+          
+    <path d="M20,250 C40,248 60,252 80,250 C100,248 120,252 140,250 C160,248 180,252 200,250 C220,248 240,252 260,250 C280,248 300,252 320,250 C340,248 360,252 380,250" 
+          fill="none" stroke-linecap="round" />
+  </g>
+  
+  <!-- Decorative floating elements -->
+  <g opacity="0.4" filter="url(#pricing-blur)">
+    <!-- Artistic circles -->
+    <circle cx="80" cy="120" r="20" fill="currentColor" opacity="0.05" />
+    <circle cx="320" cy="180" r="30" fill="currentColor" opacity="0.04" />
+    <circle cx="150" cy="280" r="25" fill="currentColor" opacity="0.03" />
+    <circle cx="250" cy="350" r="15" fill="currentColor" opacity="0.05" />
+    
+    <!-- Artistic brush strokes -->
+    <path d="M50,400 C70,380 100,420 120,400 C140,380 160,420 180,400" 
+          stroke="currentColor" stroke-width="8" fill="none" 
+          stroke-linecap="round" opacity="0.06" />
+          
+    <path d="M220,450 C240,430 270,470 290,450 C310,430 330,470 350,450" 
+          stroke="currentColor" stroke-width="10" fill="none" 
+          stroke-linecap="round" opacity="0.04" />
+          
+    <!-- Decorative dots -->
+    <circle cx="30" cy="350" r="3" fill="currentColor" opacity="0.2" />
+    <circle cx="60" cy="320" r="2" fill="currentColor" opacity="0.2" />
+    <circle cx="90" cy="380" r="4" fill="currentColor" opacity="0.15" />
+    <circle cx="120" cy="340" r="2.5" fill="currentColor" opacity="0.2" />
+    <circle cx="350" cy="400" r="3" fill="currentColor" opacity="0.2" />
+    <circle cx="320" cy="420" r="2" fill="currentColor" opacity="0.2" />
+    <circle cx="280" cy="390" r="4" fill="currentColor" opacity="0.15" />
+    <circle cx="240" cy="410" r="2.5" fill="currentColor" opacity="0.2" />
+  </g>
+</svg> 

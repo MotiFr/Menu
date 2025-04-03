@@ -1,0 +1,41 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="watercolor-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+    </filter>
+    <linearGradient id="splash-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main watercolor shape -->
+  <path d="M200,200 
+           C180,120 220,100 210,50 
+           C250,80 280,60 320,100 
+           C290,150 350,170 320,230 
+           C290,280 230,270 220,310 
+           C170,320 120,280 90,300 
+           C50,250 80,190 60,150 
+           C80,90 150,100 200,200 Z" 
+        fill="url(#splash-gradient)" 
+        filter="url(#watercolor-blur)"
+        opacity="0.8">
+    <animate attributeName="d"
+             dur="30s"
+             repeatCount="indefinite"
+             values="
+             M200,200 C180,120 220,100 210,50 C250,80 280,60 320,100 C290,150 350,170 320,230 C290,280 230,270 220,310 C170,320 120,280 90,300 C50,250 80,190 60,150 C80,90 150,100 200,200 Z;
+             M200,200 C190,130 230,90 220,60 C240,90 270,70 310,110 C280,140 340,180 310,220 C300,290 220,260 210,300 C180,310 130,270 100,290 C60,240 90,200 70,160 C70,100 160,110 200,200 Z;
+             M200,200 C180,120 220,100 210,50 C250,80 280,60 320,100 C290,150 350,170 320,230 C290,280 230,270 220,310 C170,320 120,280 90,300 C50,250 80,190 60,150 C80,90 150,100 200,200 Z"
+             calcMode="spline"
+             keySplines="0.5 0 0.5 1; 0.5 0 0.5 1"
+             keyTimes="0; 0.5; 1" />
+  </path>
+  
+  <!-- Additional watercolor splotches -->
+  <ellipse cx="320" cy="150" rx="25" ry="20" fill="currentColor" opacity="0.3" filter="url(#watercolor-blur)" transform="rotate(20)" />
+  <ellipse cx="100" cy="240" rx="30" ry="25" fill="currentColor" opacity="0.2" filter="url(#watercolor-blur)" transform="rotate(-15)" />
+  <ellipse cx="240" cy="80" rx="20" ry="15" fill="currentColor" opacity="0.25" filter="url(#watercolor-blur)" transform="rotate(10)" />
+  <ellipse cx="180" cy="300" rx="35" ry="25" fill="currentColor" opacity="0.15" filter="url(#watercolor-blur)" transform="rotate(-5)" />
+</svg> 

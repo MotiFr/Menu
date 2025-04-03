@@ -1,0 +1,4 @@
+<svg width="1440" height="100" viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,50 C240,110 480,0 720,50 C960,100 1200,10 1440,50 L1440,100 L0,100 Z" fill="currentColor" opacity="0.2"/>
+  <path d="M0,60 C240,10 480,90 720,60 C960,30 1200,70 1440,50 L1440,100 L0,100 Z" fill="currentColor" opacity="0.1"/>
+</svg> 

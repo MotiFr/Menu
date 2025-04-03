@@ -1,0 +1,39 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Artistic grid pattern -->
+  <g stroke="currentColor" stroke-width="0.7" opacity="0.8">
+    <!-- Vertical lines with artistic variations -->
+    <path d="M50,0 Q52,150 50,300 Q48,450 50,600" fill="none" />
+    <path d="M100,0 Q103,150 100,300 Q97,450 100,600" fill="none" />
+    <path d="M150,0 Q147,150 150,300 Q153,450 150,600" fill="none" />
+    <path d="M200,0 Q204,150 200,300 Q196,450 200,600" fill="none" />
+    <path d="M250,0 Q246,150 250,300 Q254,450 250,600" fill="none" />
+    <path d="M300,0 Q305,150 300,300 Q295,450 300,600" fill="none" />
+    <path d="M350,0 Q345,150 350,300 Q355,450 350,600" fill="none" />
+    
+    <!-- Horizontal lines with artistic variations -->
+    <path d="M0,50 Q100,48 200,50 Q300,52 400,50" fill="none" />
+    <path d="M0,100 Q100,103 200,100 Q300,97 400,100" fill="none" />
+    <path d="M0,150 Q100,147 200,150 Q300,153 400,150" fill="none" />
+    <path d="M0,200 Q100,204 200,200 Q300,196 400,200" fill="none" />
+    <path d="M0,250 Q100,246 200,250 Q300,254 400,250" fill="none" />
+    <path d="M0,300 Q100,305 200,300 Q300,295 400,300" fill="none" />
+    <path d="M0,350 Q100,345 200,350 Q300,355 400,350" fill="none" />
+    <path d="M0,400 Q100,404 200,400 Q300,396 400,400" fill="none" />
+    <path d="M0,450 Q100,447 200,450 Q300,453 400,450" fill="none" />
+    <path d="M0,500 Q100,503 200,500 Q300,497 400,500" fill="none" />
+    <path d="M0,550 Q100,548 200,550 Q300,552 400,550" fill="none" />
+  </g>
+  
+  <!-- Artistic flourishes -->
+  <path d="M20,150 Q100,130 180,150" stroke="currentColor" stroke-width="1" fill="none" />
+  <path d="M220,250 Q300,230 380,250" stroke="currentColor" stroke-width="1" fill="none" />
+  <path d="M50,350 Q150,370 250,350" stroke="currentColor" stroke-width="1" fill="none" />
+  <path d="M150,450 Q230,430 310,450" stroke="currentColor" stroke-width="1" fill="none" />
+  
+  <!-- Hand-drawn style circles -->
+  <circle cx="50" cy="150" r="3" fill="currentColor" opacity="0.5" />
+  <circle cx="350" cy="250" r="4" fill="currentColor" opacity="0.5" />
+  <circle cx="200" cy="350" r="3" fill="currentColor" opacity="0.5" />
+  <circle cx="100" cy="450" r="4" fill="currentColor" opacity="0.5" />
+  <circle cx="300" cy="550" r="3" fill="currentColor" opacity="0.5" />
+</svg> 

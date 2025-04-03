@@ -1,0 +1,20 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <path d="M50,200 C120,100 180,220 250,120 C320,50 380,180 390,100" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="40" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        opacity="0.7"
+        transform="rotate(-8)">
+  </path>
+  <path d="M30,220 C100,130 160,240 220,140 C290,70 350,200 380,120" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="25" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        opacity="0.5"
+        transform="rotate(-5)">
+  </path>
+</svg> 

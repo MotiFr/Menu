@@ -15,7 +15,7 @@ const translations = {
     heb: {
         title: "הפכו את התפריט שלכם לחוויה דיגיטלית",
         subtitle: "העלו את התפריט שלכם והמירו אותו לתפריט דיגיטלי אטרקטיבי, עם עיצובים חדשניים וקלים ליישום.",
-        getStarted: "התחל עכשיו"
+        getStarted: "התחילו עכשיו"
     },
 };
 
@@ -784,7 +784,7 @@ export default async function Home({ searchParams }) {
                                     <p className="text-base text-amber-700 dark:text-amber-400 leading-relaxed group-hover:text-amber-800 dark:group-hover:text-amber-300 transition-colors duration-500">
                                         {lang === 'eng' 
                                             ? 'Owner of multiple restaurants? Want to add a payment option from your menu? Contact us and we will tell you more.'
-                                            : 'בעלי כמה מסדעות / רוצה להוסיף אפשרות תשלום מהתפריט שלכם? צור קשר ונספר לכם עוד יותר.'}
+                                            : 'בעלי כמה מסעדות / רוצה להוסיף אפשרות תשלום מהתפריט שלכם? צור קשר ונספר לכם עוד יותר.'}
                                     </p>
                                 </div>
 
